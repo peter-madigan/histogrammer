@@ -1,0 +1,108 @@
+# Generates the necessary histograms for the Module 0+1 muon capture analysis:
+
+#  - Delayed time spectrum
+#  - Delayed signal energy (from light system)
+#  - Michel tag
+#  - Michel energy (from charge system)
+#  - Proton score (for reweighting proton background)
+
+import:
+  - numpy
+
+
+variables:
+  prompt:
+    path: [analysis/muon_capture/prompt]
+  delayed:
+    path: [analysis/muon_capture/delayed]
+  michel_label:
+    path: [analysis/michel_id/michel_label]
+  stop_label:
+    path: [analysis/stopping_muons/event_sel_reco]
+  capture_truth:
+    path: [analysis/muon_capture/truth_labels]
+  stop_truth:
+    path: [analysis/stopping_muons/event_sel_truth]
+
+
+histograms:
+  michel_label:
+    variable: michel_label
+    field: michel_flag
+    bins: {low: -1, high: 3, n: 4}
+
+  tagged_energy:
+    variable: michel_label
+    field: michel_e
+    bins: {low: -1000, high: 100000, n: 101} # 1MeV
+
+  delayed_time:
+    variable: delayed
+    field: delay
+    bins: {low: -1000, high: 100000, n: 1010} # 10ns
+
+  delayed_energy:
+    loop: delayed
+    variable: delayed_energy
+    bins: {low: -1000, high: 100000, n: 1010} # 1MeV
+
+  delayed_time_energy_correlation:
+    variable:
+      - delayed
+      - delayed_energy
+    field:
+      - delay
+      - null
+    bins:
+      - {low: -1000, high: 100000, n: 101}
+      - {low: -1000, high: 100000, n: 101}
+
+  proton_score:
+    loop: stop_label
+    variable: proton_score
+    bins: {low: -5, high: 5, n: 1001}
+
+filters:
+  # Events passing the stopping muon selection and ID'd as Michel decays
+  reco_michel:
+    "stop_label['sel'] & michel_label['michel_flag'] & (numpy.sum(michel_label['muon_dir'] * michel_label['michel_dir'], axis=-1) > -0.99)"
+  # Events passing the stopping muon selection and *not* ID'd as Michel decays
+  reco_capt:
+    "stop_label['sel'] & ~michel_label['michel_flag'] & (numpy.sum(michel_label['muon_dir'] * michel_label['michel_dir'], axis=-1) > -0.99)"
+
+  # Events reconstructed as Michels that are actual stopping muons with Michel decays
+  true_michel:
+    "reco_michel & capture_truth['michel'] & stop_truth['sel']"
+  # Events reconstructed as captures that are actual stopping mu- without a Michel decay
+  true_capt:
+    "reco_capt & (capture_truth['stopping_pdg_id'] == 13) & ~capture_truth['michel'] & stop_truth['sel']"
+
+  # Backgrounds contributing to reconstructed Michels
+  bkg_michel_capt:
+    "reco_michel & (capture_truth['stopping_pdg_id'] == 13) & ~capture_truth['michel'] & stop_truth['sel']"
+  bkg_michel_proton:
+    "reco_michel & (capture_truth['stopping_pdg_id'] == 2212)"
+  bkg_michel_muon:
+    "reco_michel & (numpy.abs(capture_truth['stopping_pdg_id']) == 13) & ~stop_truth['sel']"
+  bkg_michel_other:
+    "reco_michel & ~(true_michel | bkg_michel_capt | bkg_michel_proton | bkg_michel_muon)"
+
+  # Backgrounds contributing to reconstructed captures
+  bkg_capt_michel:
+    "reco_capt & capture_truth['michel'] & stop_truth['sel']"
+  bkg_capt_proton:
+    "reco_capt & (capture_truth['stopping_pdg_id'] == 2212)"
+  bkg_capt_muon:
+    "reco_capt & (numpy.abs(capture_truth['stopping_pdg_id']) == 13) & ~stop_truth['sel']"
+  bkg_capt_other:
+    "reco_capt & ~(true_capt | bkg_capt_michel | bkg_capt_proton | bkg_capt_muon)"
+
+  # Events that have a track stopping in the detector, but have a dQ/dx profile consistent with a proton
+  reco_proton:
+    "stop_label['stop'] & (stop_label['muon_loglikelihood_mean'] - stop_label['proton_loglikelihood_mean'] < 0.2576) & (stop_label['proton_loglikelihood_mean'] - stop_label['mip_loglikelihood_mean'] > 0)"
+
+  # Variables that we also want to extract, but require a bit more manipulation
+  delayed_energy:
+    "delayed['ampl'].sum(axis=-1).sum(axis=-1)"
+  proton_score:
+    "stop_label['muon_loglikelihood_mean'] - stop_label['proton_loglikelihood_mean']"
