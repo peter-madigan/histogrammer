@@ -1,0 +1,56 @@
+import:
+  - numpy
+
+datasets:
+  event:
+    path: [charge/events]
+  hits:
+    path: [charge/events, charge/hits]
+
+histograms:
+  n_ext_trigs:
+    variable: event
+    field: n_ext_trigs
+    bins: {low: 0, high: 10, n: 10}
+
+  event_dt:
+    variable: event_dt
+    loop: event
+    bins: {low: -1.1e+7, high: 1.1e+7, n: 2200}
+
+  hit_charge:
+    variable: hit_q
+    loop: event
+    bins: {low: -5.e+3, high: 100.e+3, n: 105}
+
+  hit_pos:
+    variable: [hits, hits, hits]
+    field: [px, py, iogroup]
+    loop: event
+    bins:
+      - {low: -310.38, high: 310.38, n: 200}
+      - {low: -620.76, high: 620.76, n: 400}
+      - {low: 1, high: 2, n: 2}
+
+  q_pos:
+    variable: [hits, hits, hits]
+    field: [px, py, iogroup]
+    weight: hit_q
+    loop: event
+    bins:
+      - {low: -310.38, high: 310.38, n: 200}
+      - {low: -620.76, high: 620.76, n: 400}
+      - {low: 1, high: 2, n: 2}
+
+variables:
+  clean_events:
+    expr: "(event['n_ext_trigs'] == 2)"
+
+  event_dt:
+    expr: "numpy.append([-1], np.diff(event['ts_start'].astype(int)))"
+    filt: False
+
+  hit_q:
+    expr: "hits['q'] * 221"
+    filt: False
+
