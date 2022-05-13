@@ -1,9 +1,12 @@
 '''
-General approach:
-The user defines:
- 1. a dataset path (and optionally a variable in that dataset)
- 2. optional, the bin edges
- 3. a collection of variables and filters defined by:
+This is a tool to assist in combining data from a large number of runs
+to generate histograms of various parameters of interest.
+
+For each histogram, a user defines:
+ 1. a particular variable used to fill the histogram (it can be multiple for N-dimensional histograms)
+ 2. the bins used for the histogram
+ 3. a set of filters and variables defining the unique histograms to be generated
+ 3. a path to datasets used create the histograms, variables, and filters
   a. a dataset path (and optionally a variable in that dataset)
   b. a python expression that returns an array of bools
 
@@ -19,31 +22,38 @@ Group structure in output HDF5 file::
     <histogram name>/run/<filename>/overall
     <histogram name>/run/<filename/<filter name>
 
-If a batch_size is defined, then the files will be looped over rather than
+Bins will be saved as attributes (`bins{i}`) under the `<histogram>` group along
+with a string of the configuration used to generate the histogram.
+
+If a ``--batch_size`` is defined, then the files will be looped over rather than
 loading all data at once.
 
 Yaml spec::
 
+    import: # optional
+     - <python module name required by variables>
+
     histograms:
         <histogram name>:
-          variable: <variable name>
-          field: <str, optional>
-          bins: <[bin_low_edge, ..., bin_high_edge] or
-            low: bin_low_edge, high: bin_high_edge, n: nbins>
+          variable: <variable name> or [<var 1 name>, <var 2 name>, ...]
+          field: <str or null, optional> or [<field 1 name>, <field 2 name>, ...]
+          loop: <variable used to calculate loop size, optional>
+          bins: [<bin_low_edge>, ..., <bin_high_edge>] or
+            {low: bin_low_edge, high: bin_high_edge, n: nbins} or list of either for N-D histograms
 
     variables:
       <variable name>:
+        expr: <eval string describing variable>
+        filt: <bool, true if a histogram should be generated with this variable interpreted as a filter, optional, default=True>
+
+    datasets:
+      <dset name>:
         path:
           - <dataset 0 name>
           - ...
           - <dataset N name>
         field: <str, optional>
 
-    filters:
-      <filter name>: <str describing filter>
-
-    import:
-     - <module name>
 '''
 import os
 import multiprocessing
@@ -54,6 +64,7 @@ import h5py
 import yaml
 import tqdm
 import numpy as np
+import numpy.ma as ma
 
 from h5flow import H5FLOW_MPI
 global H5FLOW_MPI
@@ -69,7 +80,15 @@ def generate_bins(spec):
     return bins
 
 
-def generate_histogram(i, filepath, variable, bins, field=None, variables=None, filters=None, batch_size=None, imports=None, loop=None):
+def only_valid(maybe_masked_arr):
+    if maybe_masked_arr is None:
+        return None
+    return (maybe_masked_arr.ravel()
+        if not ma.is_masked(maybe_masked_arr)
+        else maybe_masked_arr.compressed())
+
+
+def generate_histogram(i, filepath, variable, bins, field=None, weight=None, datasets=None, variables=None, batch_size=None, imports=None, loop=None):
     if imports is not None:
         for lib in imports:
             globals()[lib] = __import__(lib)
@@ -81,62 +100,70 @@ def generate_histogram(i, filepath, variable, bins, field=None, variables=None, 
     bins = [generate_bins(b) for b in bins]
     hist = dict()
     hist['overall'] = np.zeros([len(b)-1 for b in bins])
-    if filters:
-        for filt in filters:
-            hist[filt] = np.zeros([len(b)-1 for b in bins])
+    if variables:
+        for var in variables:
+            if variables[var].get('filt',True):
+                hist[var] = np.zeros([len(b)-1 for b in bins])
 
     # Initialize loop
     if loop is None:
-        rows = f[variables[variable[0]]['path'][0] + '/data'].shape[0]
+        rows = f[datasets[variable[0]]['path'][0] + '/data'].shape[0]
     else:
-        rows = f[variables[loop]['path'][0] + '/data'].shape[0]
+        rows = f[datasets[loop]['path'][0] + '/data'].shape[0]
     if batch_size:
         batches = tqdm.tqdm([slice(i,i+batch_size) for i in range(0,rows,batch_size)],
             position=i, smoothing=0, desc=os.path.basename(filepath))
     else:
-        batches = tqdm.tqdm([slice(None)],
+        batches = tqdm.tqdm([slice(0,rows)],
             position=i, desc=os.path.basename(filepath))
 
     # Initialize filter operations
-    filt_op = dict()
-    if filters:
-        for filt,expr in filters.items():
-            filt_op[filt] = eval('lambda : (' + expr +').astype(bool)')
+    var_op = dict()
+    if variables:
+        for var in variables:
+            expr = variables[var]['expr']
+            var_op[var] = eval('lambda : ' + expr)
 
     # Run loop
     for batch in batches:
         # Load data
-        if variables is not None:
-            for var,spec in variables.items():
-                # Load variable
+        if datasets is not None:
+            for dset,spec in datasets.items():
+                # Load dataset
                 try:
-                    globals()[var] = f[tuple(spec['path'] + [batch])]
-                    var_field = spec.get('field')
-                    if var_field:
-                        globals()[var] = globals()[var][var_field]
+                    globals()[dset] = f[tuple(spec['path'] + [batch])]
+                    dset_field = spec.get('field')
+                    if dset_field:
+                        globals()[dset] = globals()[dset][dset_field]
+                except Exception as e:
+                    warnings.warn(f'error in {dset} : '+str(e))
+                    globals()[dset] = None
+
+        # Load variables
+        if variables:
+            for var in variables:
+                # Apply variable function
+                try:
+                    globals()[var] = var_op[var]()
                 except Exception as e:
                     warnings.warn(f'error in {var} : '+str(e))
-                    globals()[var] = None
-
-        # Apply filters
-        if filters:
-            for filt,spec in filters.items():
-                # Apply filter function
-                try:
-                    globals()[filt] = filt_op[filt]()
-                except Exception as e:
-                    warnings.warn(f'error in {filt} : '+str(e))
-                    globals()[filt] = slice(None)
+                    globals()[var] = slice(None)
 
         data = [globals()[v] for v in variable]
         if field:
-            data = [np.clip(d[f].ravel(), b[0], b[-1]) if f is not None else np.clip(d.ravel(), b[0], b[-1]) for d,f,b in zip(data, field, bins)]
+            data = [d[f].clip(b[0], b[-1]) if f is not None else d.clip(b[0], b[-1]) for d,f,b in zip(data, field, bins)]
 
         # Update histograms
-        hist['overall'] += np.histogramdd(data, bins=bins)[0]
-        if filters:
-            for filt in filters:
-                hist[filt] += np.histogramdd([d[globals()[filt].reshape(d.shape)] for d in data], bins=bins)[0]
+        if weight:
+            w = globals()[weight]
+        else:
+            w = None
+        hist['overall'] += np.histogramdd([only_valid(d) for d in data], bins=bins, weights=only_valid(w))[0]
+        if variables:
+            for var in variables:
+                if variables[var].get('filt', True) and np.any(globals()[var]):
+                    mask = globals()[var].astype(bool)
+                    hist[var] += np.histogramdd([only_valid(d[mask]) for d in data], bins=bins, weights=only_valid(w[mask] if w is not None else None))[0]
 
     # Return histograms
     return hist.copy()
@@ -162,19 +189,19 @@ def save(outpath, hist_name, filepath, hist_dict, hist_config):
 
         # update run-level histograms
         run_grp = f[hist_name]['run'][filename]
-        for filt in hist_dict:
-            if filt not in run_grp:
-                run_grp.create_dataset(filt, data=hist_dict[filt])
+        for hist in hist_dict:
+            if hist not in run_grp:
+                run_grp.create_dataset(hist, data=hist_dict[hist])
             else:
-                run_grp[filt][:] = run_grp[filt][:] + hist_dict[filt]
+                run_grp[hist][:] = run_grp[hist][:] + hist_dict[hist]
 
         # update global histograms
         sum_grp = f[hist_name]['sum']
-        for filt in hist_dict:
-            if filt not in sum_grp:
-                sum_grp.create_dataset(filt, data=hist_dict[filt])
+        for hist in hist_dict:
+            if hist not in sum_grp:
+                sum_grp.create_dataset(hist, data=hist_dict[hist])
             else:
-                sum_grp[filt][:] = sum_grp[filt][:] + hist_dict[filt]
+                sum_grp[hist][:] = sum_grp[hist][:] + hist_dict[hist]
 
 
 def main(config_yaml, outpath, filepaths, processes=None, batch_size=None, **kwargs):
@@ -201,7 +228,7 @@ def main(config_yaml, outpath, filepaths, processes=None, batch_size=None, **kwa
     print(f'Running on {processes} processes...')
     with multiprocessing.Pool(processes) as p:
         for hist in config.get('histograms', dict()):
-            print(f'Generating {hist}...')
+            print(f'\nGenerating {hist}...')
             results = []
             for i,filepath in enumerate(filepaths):
                 results.append(p.apply_async(generate_histogram,
@@ -211,10 +238,11 @@ def main(config_yaml, outpath, filepaths, processes=None, batch_size=None, **kwa
                         variable=config['histograms'][hist]['variable'],
                         bins=config['histograms'][hist]['bins'],
                         field=config['histograms'][hist].get('field'),
+                        datasets=config.get('datasets'),
                         variables=config.get('variables'),
-                        filters=config.get('filters'),
                         batch_size=batch_size,
                         loop=config['histograms'][hist].get('loop'),
+                        weight=config['histograms'][hist].get('weight'),
                         imports=config.get('import'))))
 
             for filepath, result in zip(filepaths, results):
@@ -222,7 +250,7 @@ def main(config_yaml, outpath, filepaths, processes=None, batch_size=None, **kwa
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--outpath', '-o', type=str,
         required=True, help='''output hdf5 file to generate''')
     parser.add_argument('--filepaths', '-i', nargs='+', type=str, required=True,
