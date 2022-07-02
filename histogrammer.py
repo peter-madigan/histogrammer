@@ -59,6 +59,7 @@ import os
 import multiprocessing
 import argparse
 import warnings
+import time
 
 import h5py
 import yaml
@@ -74,103 +75,147 @@ from h5flow.data import H5FlowDataManager
 
 def generate_bins(spec):
     if isinstance(spec, dict):
-        bins = np.linspace(spec['low'], spec['high'], spec['n']+1)
+        if not 'log' in spec or spec['log'] == False:
+            bins = np.linspace(spec['low'], spec['high'], spec['n']+1)
+        else:
+            bins = np.geomspace(spec['low'], spec['high'], spec['n']+1)            
     else:
         bins = np.array(spec)
     return bins
 
 
-def only_valid(maybe_masked_arr):
+def only_valid(maybe_masked_arr, fill=0):
     if maybe_masked_arr is None:
         return None
     return (maybe_masked_arr.ravel()
-        if not ma.is_masked(maybe_masked_arr)
-        else maybe_masked_arr.compressed())
+            if not ma.is_masked(maybe_masked_arr)
+            else maybe_masked_arr.filled(fill))
 
 
-def generate_histogram(i, filepath, variable, bins, field=None, weight=None, datasets=None, variables=None, batch_size=None, imports=None, loop=None):
+def generate_histograms(index, filepath, histograms, *args, datasets=None, variables=None, batch_size=None, imports=None, create_event_list=False, **kwargs):
     if imports is not None:
         for lib in imports:
             globals()[lib] = __import__(lib)
 
     # Open the file
-    f = H5FlowDataManager(filepath, 'r', mpi=False)
+    try:
+        f = H5FlowDataManager(filepath, 'r', mpi=False)
+        basename = os.path.basename(filepath)
 
-    # Initialize histogram(s)
-    bins = [generate_bins(b) for b in bins]
-    hist = dict()
-    hist['overall'] = np.zeros([len(b)-1 for b in bins])
-    if variables:
-        for var in variables:
-            if variables[var].get('filt',True):
-                hist[var] = np.zeros([len(b)-1 for b in bins])
+        # Initialize histogram(s)
+        bins = dict()
+        hists = dict()
+        for hist in histograms:
+            bins[hist] = [generate_bins(b) for b in histograms[hist]['bins']]
+            hists[hist] = dict()
+            hists[hist]['overall'] = np.zeros([len(b)-1 for b in bins[hist]])
+            if variables:
+                for var in variables:
+                    if variables[var].get('filt',True):
+                        hists[hist][var] = np.zeros([len(b)-1 for b in bins[hist]])
 
-    # Initialize loop
-    if loop is None:
-        rows = f[datasets[variable[0]]['path'][0] + '/data'].shape[0]
-    else:
-        rows = f[datasets[loop]['path'][0] + '/data'].shape[0]
-    if batch_size:
-        batches = tqdm.tqdm([slice(i,i+batch_size) for i in range(0,rows,batch_size)],
-            position=i, smoothing=0, desc=os.path.basename(filepath))
-    else:
-        batches = tqdm.tqdm([slice(0,rows)],
-            position=i, desc=os.path.basename(filepath))
-
-    # Initialize filter operations
-    var_op = dict()
-    if variables:
-        for var in variables:
-            expr = variables[var]['expr']
-            var_op[var] = eval('lambda : ' + expr)
-
-    # Run loop
-    for batch in batches:
-        # Load data
-        if datasets is not None:
-            for dset,spec in datasets.items():
-                # Load dataset
-                try:
-                    globals()[dset] = f[tuple(spec['path'] + [batch])]
-                    dset_field = spec.get('field')
-                    if dset_field:
-                        globals()[dset] = globals()[dset][dset_field]
-                except Exception as e:
-                    warnings.warn(f'error in {dset} : '+str(e))
-                    globals()[dset] = None
-
-        # Load variables
-        if variables:
-            for var in variables:
-                # Apply variable function
-                try:
-                    globals()[var] = var_op[var]()
-                except Exception as e:
-                    warnings.warn(f'error in {var} : '+str(e))
-                    globals()[var] = slice(None)
-
-        data = [globals()[v] for v in variable]
-        if field:
-            data = [d[f].clip(b[0], b[-1]) if f is not None else d.clip(b[0], b[-1]) for d,f,b in zip(data, field, bins)]
-
-        # Update histograms
-        if weight:
-            w = globals()[weight]
+        # Initialize loop
+        loop_dataset = [datasets[d] for d in datasets if 'loop' in datasets[d] and datasets[d]['loop']][0]
+        rows = f[loop_dataset['path'][0] + '/data'].shape[0]
+        if batch_size:
+            batches = [slice(i,min(i+batch_size,rows)) for i in range(0,rows,batch_size)]
         else:
-            w = None
-        hist['overall'] += np.histogramdd([only_valid(d) for d in data], bins=bins, weights=only_valid(w))[0]
+            batches = [slice(0,rows)]
+
+        # Initialize filter operations
+        var_op = dict()
         if variables:
             for var in variables:
-                if variables[var].get('filt', True) and np.any(globals()[var]):
-                    mask = globals()[var].astype(bool)
-                    hist[var] += np.histogramdd([only_valid(d[mask]) for d in data], bins=bins, weights=only_valid(w[mask] if w is not None else None))[0]
+                expr = variables[var]['expr']
+                var_op[var] = eval('lambda : ' + expr)
 
-    # Return histograms
-    return hist.copy()
+        # Run loop
+        event_list = dict()
+        if variables and create_event_list:
+            for var in variables:
+                if variables[var].get('filt', True):
+                    event_list[var] = []
+                
+        for batch in batches:
+            # Load data
+            if datasets is not None:
+                for dset,spec in datasets.items():
+                    # Load dataset
+                    try:
+                        globals()[dset] = f[tuple(spec['path'] + [batch])]
+                        dset_field = spec.get('field')
+                        if dset_field:
+                            globals()[dset] = globals()[dset][dset_field]
+                    except Exception as e:
+                        warnings.warn(f'error in {basename}/{dset} : '+str(e))
+                        globals()[dset] = None
+
+            # Load variables
+            if variables:
+                for var in variables:
+                    # Apply variable function
+                    try:
+                        globals()[var] = var_op[var]()
+                        if create_event_list and variables[var].get('filt', True):
+                            event_list[var] += (np.where(globals()[var])[0] + batch.start).tolist()
+                    except Exception as e:
+                        warnings.warn(f'error in {basename}/{var} : '+str(e))
+                        globals()[var] = slice(None)
+
+            # Update histograms
+            for hist in histograms:
+                try:
+                    variable = histograms[hist]['variable']
+                    field = histograms[hist]['field']
+                    weight = histograms[hist]['weight']
+            
+                    data = [globals()[v] for v in variable]
+                    if field:
+                        data = [d[f].clip(b[0], b[-1]) if f is not None else d.clip(b[0], b[-1]) for d,f,b in zip(data, field, bins[hist])]
+
+                    if weight:
+                        w = globals()[weight]
+                    else:
+                        w = None
+
+                    hists[hist]['overall'] += np.histogramdd([only_valid(d, bins[hist][i][0]) for i,d in enumerate(data)], bins=bins[hist], weights=only_valid(w))[0]
+                    if variables:
+                        for var in variables:
+                            if variables[var].get('filt', True) and np.any(globals()[var]):
+                                mask = globals()[var].astype(bool)
+                                hists[hist][var] += np.histogramdd([only_valid(d[mask], bins[hist][i][0]) for i,d in enumerate(data)], bins=bins[hist], weights=only_valid(w[mask] if w is not None else None))[0]
+                except Exception as e:
+                    warnings.warn(f'error filling {basename}/{hist} : '+str(e))
+
+        # Return histograms
+        return index, hists.copy(), event_list.copy()
+    except Exception as e:
+        print('Error:',filepath,e)
+        return index, None, None
 
 
-def save(outpath, hist_name, filepath, hist_dict, hist_config):
-    with h5py.File(outpath, 'a') as f:
+def save(f, filepath, hists, histograms, event_list, compression):
+    filename = os.path.basename(filepath)
+
+    compression_args = dict()
+    if compression > 0:
+        compression_args['compression'] = 'gzip'
+        compression_args['compression_opts'] = compression
+
+    # maybe create new event list
+    if event_list is not None:
+        if 'events' not in f:
+            f.create_group('events')
+
+        for filt in event_list:
+            if filt not in f['events']:
+                f['events'].create_group(filt)
+
+            if filename not in f['events'][filt]:
+                f['events'][filt].create_dataset(filename, data=np.array(event_list[filt]), **compression_args)
+
+    for hist_name in hists:
+        hist_config = histograms[hist_name]
         # maybe create new histogram entry
         if hist_name not in f:
             f.create_group(hist_name)
@@ -182,16 +227,16 @@ def save(outpath, hist_name, filepath, hist_dict, hist_config):
             f[hist_name].create_group('run')
 
         # maybe create new individual run dataset
-        filename = os.path.basename(filepath)
         if filename not in f[hist_name]['run']:
             f[hist_name]['run'].create_group(filename)
             f[hist_name]['run'][filename].attrs['filepath'] = filepath
 
         # update run-level histograms
+        hist_dict = hists[hist_name]
         run_grp = f[hist_name]['run'][filename]
         for hist in hist_dict:
             if hist not in run_grp:
-                run_grp.create_dataset(hist, data=hist_dict[hist])
+                run_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
             else:
                 run_grp[hist][:] = run_grp[hist][:] + hist_dict[hist]
 
@@ -199,12 +244,19 @@ def save(outpath, hist_name, filepath, hist_dict, hist_config):
         sum_grp = f[hist_name]['sum']
         for hist in hist_dict:
             if hist not in sum_grp:
-                sum_grp.create_dataset(hist, data=hist_dict[hist])
+                sum_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
             else:
                 sum_grp[hist][:] = sum_grp[hist][:] + hist_dict[hist]
 
+finished = []
+def pool_callback(result):
+    global finished
+    finished.append(result)
 
-def main(config_yaml, outpath, filepaths, processes=None, batch_size=None, **kwargs):
+def pool_error_callback(error):
+    print(error)
+
+def main(config_yaml, outpath, filepaths, compression, processes=None, batch_size=None, event_list=None, **kwargs):
     # load configuration
     with open(config_yaml) as cf:
         config = yaml.load(cf, Loader=yaml.FullLoader)
@@ -218,35 +270,46 @@ def main(config_yaml, outpath, filepaths, processes=None, batch_size=None, **kwa
                 hist_config['field'] = [hist_config['field']]
             if 'bins' in hist_config:
                 hist_config['bins'] = [hist_config['bins']]
+        if 'field' not in hist_config:
+            hist_config['field'] = None
+        if 'weight' not in hist_config:
+            hist_config['weight'] = None
+
 
     with h5py.File(outpath, 'a') as f:
         f['/'].attrs['config'] = str(config)
 
-    processes = processes if processes is not None else multiprocessing.cpu_count()
-    processes = min(processes, len(filepaths))
+        processes = processes if processes is not None else multiprocessing.cpu_count()
+        processes = min(processes, len(filepaths))
 
-    print(f'Running on {processes} processes...')
-    with multiprocessing.Pool(processes) as p:
-        for hist in config.get('histograms', dict()):
-            print(f'\nGenerating {hist}...')
-            results = []
-            for i,filepath in enumerate(filepaths):
-                results.append(p.apply_async(generate_histogram,
-                    tuple(),
-                    dict(
-                        i=i % processes, filepath=filepath,
-                        variable=config['histograms'][hist]['variable'],
-                        bins=config['histograms'][hist]['bins'],
-                        field=config['histograms'][hist].get('field'),
-                        datasets=config.get('datasets'),
-                        variables=config.get('variables'),
-                        batch_size=batch_size,
-                        loop=config['histograms'][hist].get('loop'),
-                        weight=config['histograms'][hist].get('weight'),
-                        imports=config.get('import'))))
+        print(f'Running on {processes} processes...')
+        global finished
+        with multiprocessing.Pool(processes) as p:
+            results = {}
+            pbar = tqdm.tqdm(enumerate(filepaths), smoothing=0, total=len(filepaths))
+            for i,filepath in pbar:
+                results[i] = p.apply_async(generate_histograms,
+                                           tuple(),
+                                           dict(
+                                               index=i,
+                                               filepath=filepath,
+                                               histograms=config['histograms'],
+                                               datasets=config['datasets'],
+                                               variables=config.get('variables'),
+                                               batch_size=batch_size,
+                                               create_event_list=event_list is not None,
+                                               imports=config.get('import')),
+                                           callback=pool_callback, error_callback=pool_error_callback)
 
-            for filepath, result in zip(filepaths, results):
-                save(outpath, hist, filepath, result.get(), config['histograms'][hist])
+                while len(results) >= processes or ((i == len(filepaths)-1) and (len(results) > 0)):
+                    while len(finished):
+                        ifinish,hists,events = finished[0]
+                        if hists is not None:
+                            filepath = filepaths[ifinish]
+                            pbar.desc = os.path.basename(filepath)
+                            save(f, filepath, hists, config['histograms'], event_list=None if event_list is None else events, compression=compression)
+                        del results[ifinish]
+                        del finished[0]
 
 
 if __name__ == '__main__':
@@ -261,6 +324,10 @@ if __name__ == '__main__':
         help='''number of parallel processes (defaults to number of cpus detected)''')
     parser.add_argument('--batch_size', '-b', type=int, default=None,
         help='''batch size for loop (optional)''')
+    parser.add_argument('--compression', type=int, default=1,
+                        help='''level of compression to apply to output''')
+    parser.add_argument('--event_list', '-e', action='store_true', default=None,
+                        help='''dump a list of events matching each filter to the file''')
     args = parser.parse_args()
 
     main(**vars(args))
