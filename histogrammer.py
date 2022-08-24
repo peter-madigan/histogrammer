@@ -75,13 +75,13 @@ from h5flow.data import H5FlowDataManager
 
 def generate_bins(spec):
     if isinstance(spec, dict):
-        if not 'log' in spec or spec['log'] == False:
-            bins = np.linspace(spec['low'], spec['high'], spec['n']+1)
+        if 'log' in spec and spec['log'] == True:
+            bins = np.geomspace(spec['low'], spec['high'], spec['n']+1)
         else:
-            bins = np.geomspace(spec['low'], spec['high'], spec['n']+1)            
+            bins = np.linspace(spec['low'], spec['high'], spec['n']+1)
     else:
         bins = np.array(spec)
-    return bins
+    return np.sort(bins)
 
 
 def only_valid(maybe_masked_arr, fill=0):
@@ -181,9 +181,12 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                     hists[hist]['overall'] += np.histogramdd([only_valid(d, bins[hist][i][0]) for i,d in enumerate(data)], bins=bins[hist], weights=only_valid(w))[0]
                     if variables:
                         for var in variables:
-                            if variables[var].get('filt', True) and np.any(globals()[var]):
-                                mask = globals()[var].astype(bool)
-                                hists[hist][var] += np.histogramdd([only_valid(d[mask], bins[hist][i][0]) for i,d in enumerate(data)], bins=bins[hist], weights=only_valid(w[mask] if w is not None else None))[0]
+                            try:
+                                if variables[var].get('filt', True) and np.any(globals()[var]):
+                                    mask = globals()[var].astype(bool)
+                                    hists[hist][var] += np.histogramdd([only_valid(d[mask], bins[hist][i][0]) for i,d in enumerate(data)], bins=bins[hist], weights=only_valid(w[mask] if w is not None else None))[0]
+                            except Exception as e:
+                                warnings.warn(f'error filling {basename}/{hist}/{var} : '+str(e))
                 except Exception as e:
                     warnings.warn(f'error filling {basename}/{hist} : '+str(e))
 
@@ -256,7 +259,7 @@ def pool_callback(result):
 def pool_error_callback(error):
     print(error)
 
-def main(config_yaml, outpath, filepaths, compression, processes=None, batch_size=None, event_list=None, **kwargs):
+def main(config_yaml, outpath, filepaths, compression, processes=None, batch_size=None, event_list=None, update=None, **kwargs):
     # load configuration
     with open(config_yaml) as cf:
         config = yaml.load(cf, Loader=yaml.FullLoader)
@@ -275,6 +278,23 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
         if 'weight' not in hist_config:
             hist_config['weight'] = None
 
+        if update is not None:
+            try:
+                with h5py.File(outpath, 'a') as f:
+                    if hist_name in f and hist_name not in update:
+                        # histogram exists and we don't explicitly want to update it
+                        print(f'Skipping existing histogram {hist_name}')
+                        del config['histograms'][hist_name]
+                    elif hist_name in f and hist_name in update:
+                        # histogram exists, and we do want to update it, so lets reset it
+                        print(f'Regenerating existing histogram {hist_name}')
+                        del f[hist_name]
+                    else:
+                        # histogram doesn't exist, so just do nothing
+                        pass
+                        
+            except Exception as e:
+                print(f'Error occurred when trying to check if histogram {hist_name} exists: {e}')
 
     with h5py.File(outpath, 'a') as f:
         f['/'].attrs['config'] = str(config)
@@ -320,6 +340,8 @@ if __name__ == '__main__':
         help='''input h5flow files to generate histograms from''')
     parser.add_argument('--config_yaml', '-c', type=str, required=True,
         help='''yaml config file''')
+    parser.add_argument('--update', nargs='+', type=str,
+                        help='''only update the specified histograms''')
     parser.add_argument('--processes', '-p', type=int, default=None,
         help='''number of parallel processes (defaults to number of cpus detected)''')
     parser.add_argument('--batch_size', '-b', type=int, default=None,
