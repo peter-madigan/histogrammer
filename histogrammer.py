@@ -33,6 +33,12 @@ Yaml spec::
     import: # optional
      - <python module name required by variables>
 
+    constants:
+      <constant name>:
+        path: <path to object within input hdf5 file>
+        name: <field name or attribute name to load from "path">
+        attr: <bool, true if constant is to be fetched from group/dataset attribute rather than attempting to load a dataset>
+
     histograms:
         <histogram name>:
           variable: <variable name> or [<var 1 name>, <var 2 name>, ...]
@@ -92,7 +98,7 @@ def only_valid(maybe_masked_arr, fill=0):
             else maybe_masked_arr.filled(fill))
 
 
-def generate_histograms(index, filepath, histograms, *args, datasets=None, variables=None, batch_size=None, imports=None, create_event_list=False, **kwargs):
+def generate_histograms(index, filepath, histograms, *args, datasets=None, variables=None, constants=None, batch_size=None, imports=None, create_event_list=False, verbose=True, **kwargs):
     if imports is not None:
         for lib in imports:
             globals()[lib] = __import__(lib)
@@ -122,11 +128,27 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
         else:
             batches = [slice(0,rows)]
 
+        # Initialize constant values
+        if constants:
+            for c_name, c_config in constants.items():
+                path = c_config['path']
+                name = c_config.get('name')
+                attr = c_config.get('attr', False)
+
+                if attr == True:
+                    const = f[path].attrs[name]
+                else:
+                    const = f[path][:] if name is None else f[path][name]
+
+                globals()[c_name] = const
+                    
         # Initialize filter operations
         var_op = dict()
         if variables:
             for var in variables:
                 expr = variables[var]['expr']
+                if verbose:
+                    print(var, expr)
                 var_op[var] = eval('lambda : ' + expr)
 
         # Run loop
@@ -147,7 +169,8 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                         if dset_field:
                             globals()[dset] = globals()[dset][dset_field]
                     except Exception as e:
-                        warnings.warn(f'error in {basename}/{dset} : '+str(e))
+                        if verbose:
+                            warnings.warn(f'error in {basename}/{dset} : '+str(e))
                         globals()[dset] = None
 
             # Load variables
@@ -159,7 +182,8 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                         if create_event_list and variables[var].get('filt', True):
                             event_list[var] += (np.where(globals()[var])[0] + batch.start).tolist()
                     except Exception as e:
-                        warnings.warn(f'error in {basename}/{var} : '+str(e))
+                        if verbose:
+                            warnings.warn(f'error in {basename}/{var} : '+str(e))
                         globals()[var] = slice(None)
 
             # Update histograms
@@ -186,18 +210,21 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                                     mask = globals()[var].astype(bool)
                                     hists[hist][var] += np.histogramdd([only_valid(d[mask], bins[hist][i][0]) for i,d in enumerate(data)], bins=bins[hist], weights=only_valid(w[mask] if w is not None else None))[0]
                             except Exception as e:
-                                warnings.warn(f'error filling {basename}/{hist}/{var} : '+str(e))
+                                if verbose:
+                                    warnings.warn(f'error filling {basename}/{hist}/{var} : '+str(e))
                 except Exception as e:
-                    warnings.warn(f'error filling {basename}/{hist} : '+str(e))
+                    if verbose:
+                        warnings.warn(f'error filling {basename}/{hist} : '+str(e))
 
         # Return histograms
         return index, hists.copy(), event_list.copy()
     except Exception as e:
-        print('Error:',filepath,e)
+        if verbose:
+            print('Error:',filepath,e)
         return index, None, None
 
 
-def save(f, filepath, hists, histograms, event_list, compression):
+def save(f, filepath, hists, histograms, event_list, compression, runxrun=None):
     filename = os.path.basename(filepath)
 
     compression_args = dict()
@@ -229,19 +256,7 @@ def save(f, filepath, hists, histograms, event_list, compression):
             f[hist_name].create_group('sum')
             f[hist_name].create_group('run')
 
-        # maybe create new individual run dataset
-        if filename not in f[hist_name]['run']:
-            f[hist_name]['run'].create_group(filename)
-            f[hist_name]['run'][filename].attrs['filepath'] = filepath
-
-        # update run-level histograms
         hist_dict = hists[hist_name]
-        run_grp = f[hist_name]['run'][filename]
-        for hist in hist_dict:
-            if hist not in run_grp:
-                run_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
-            else:
-                run_grp[hist][:] = run_grp[hist][:] + hist_dict[hist]
 
         # update global histograms
         sum_grp = f[hist_name]['sum']
@@ -250,6 +265,20 @@ def save(f, filepath, hists, histograms, event_list, compression):
                 sum_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
             else:
                 sum_grp[hist][:] = sum_grp[hist][:] + hist_dict[hist]
+                
+        if runxrun is not None:
+            # maybe create new individual run dataset
+            if filename not in f[hist_name]['run']:
+                f[hist_name]['run'].create_group(filename)
+                f[hist_name]['run'][filename].attrs['filepath'] = filepath
+
+            # update run-level histograms
+            run_grp = f[hist_name]['run'][filename]
+            for hist in hist_dict:
+                if hist not in run_grp:
+                    run_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
+                else:
+                    run_grp[hist][:] = run_grp[hist][:] + hist_dict[hist]
 
 finished = []
 def pool_callback(result):
@@ -259,7 +288,7 @@ def pool_callback(result):
 def pool_error_callback(error):
     print(error)
 
-def main(config_yaml, outpath, filepaths, compression, processes=None, batch_size=None, event_list=None, update=None, **kwargs):
+def main(config_yaml, outpath, filepaths, compression, processes=None, batch_size=None, event_list=None, update=None, verbose=False, runxrun=None, **kwargs):
     # load configuration
     with open(config_yaml) as cf:
         config = yaml.load(cf, Loader=yaml.FullLoader)
@@ -283,7 +312,8 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
                 with h5py.File(outpath, 'a') as f:
                     if hist_name in f and hist_name not in update:
                         # histogram exists and we don't explicitly want to update it
-                        print(f'Skipping existing histogram {hist_name}')
+                        if verbose:
+                            print(f'Skipping existing histogram {hist_name}')
                         del config['histograms'][hist_name]
                     elif hist_name in f and hist_name in update:
                         # histogram exists, and we do want to update it, so lets reset it
@@ -316,8 +346,10 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
                                                histograms=config['histograms'],
                                                datasets=config['datasets'],
                                                variables=config.get('variables'),
+                                               constants=config.get('constants'),
                                                batch_size=batch_size,
                                                create_event_list=event_list is not None,
+                                               verbose=verbose,
                                                imports=config.get('import')),
                                            callback=pool_callback, error_callback=pool_error_callback)
 
@@ -327,7 +359,7 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
                         if hists is not None:
                             filepath = filepaths[ifinish]
                             pbar.desc = os.path.basename(filepath)
-                            save(f, filepath, hists, config['histograms'], event_list=None if event_list is None else events, compression=compression)
+                            save(f, filepath, hists, config['histograms'], event_list=None if event_list is None else events, compression=compression, runxrun=runxrun)
                         del results[ifinish]
                         del finished[0]
 
@@ -350,6 +382,10 @@ if __name__ == '__main__':
                         help='''level of compression to apply to output''')
     parser.add_argument('--event_list', '-e', action='store_true', default=None,
                         help='''dump a list of events matching each filter to the file''')
+    parser.add_argument('--verbose', '-v', action='store_true',
+                        help='''create more output''')
+    parser.add_argument('--runxrun', action='store_true', default=None,
+                        help='''save histograms run-by-run in file''')
     args = parser.parse_args()
 
     main(**vars(args))
