@@ -115,6 +115,8 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
             bins[hist] = [generate_bins(b) for b in histograms[hist]['bins']]
             hists[hist] = dict()
             hists[hist]['overall'] = np.zeros([len(b)-1 for b in bins[hist]])
+            if verbose:
+                print(hist, histograms[hist])
             if variables:
                 for var in variables:
                     if variables[var].get('filt',True):

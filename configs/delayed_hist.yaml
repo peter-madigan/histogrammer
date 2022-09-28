@@ -1,24 +1,34 @@
-# Generates the necessary histograms for the Module 0+1 muon capture analysis:
-
-#  - Delayed time spectrum
-#  - Delayed signal energy (from light system)
-#  - Michel tag
-#  - Michel energy (from charge system)
-#  - Proton score (for reweighting proton background)
+# Generates the necessary histograms for the Module 0 muon capture analysis
 
 import:
   - numpy
 
+constants:
+  light_samples:
+    attr: True
+    path: run_info
+    name: light_samples
+
+  thresholds:
+    attr: True
+    path: run_info
+    name: charge_thresholds
+
 
 datasets:
   prompt:
-    path: [analysis/muon_capture/prompt]
+    path: [analysis/time_reco/prompt]
   delayed:
-    path: [analysis/muon_capture/delayed]
+    path: [analysis/time_reco/delayed]
+  fit:
+    path: [analysis/time_reco/fit]
   michel_label:
     path: [analysis/michel_id/michel_label]
   stop_label:
     path: [analysis/stopping_muons/event_sel_reco]
+    loop: True
+  profile:
+    path: [analysis/stopping_muons/event_profile]
   capture_truth:
     path: [analysis/muon_capture/truth_labels]
   stopping_track:
@@ -27,91 +37,678 @@ datasets:
     path: [analysis/muon_capture/truth_labels/michel_track, mc_truth/tracks]
   stop_truth:
     path: [analysis/stopping_muons/event_sel_truth]
+  #align:
+  #  path: [charge/events, light/events, light/swvfm/alignment]
+  charge_events:
+     path: [charge/events]
 
 
 histograms:
-  michel_label:
-    variable: michel_label
-    field: michel_flag
-    bins: {low: -1, high: 3, n: 4}
+  d_to_edge:
+    variable: stop_label
+    field: d_to_edge
+    bins: {low: 4.4, high: 3000, n: 200, log: True} # mm
+
+  remaining_e:
+    variable: stop_label
+    field: remaining_e
+    bins: {low: -1000, high: 100000, n: 101} # keV
+
+  remaining_e_log:
+    variable: stop_label
+    field: remaining_e
+    bins: {low: 1, high: 1.0e+10, n: 101, log: True} # keV
+
+  max_dqdx:
+    variable: stop_label
+    field: max_dqdx
+    bins: {low: 0, high: 50000, n: 200} # e/mm
+
+  veto_q:
+    variable: stop_label
+    field: veto_q
+    bins: {low: 0, high: 200000, n: 200} # e
+
+  veto_q_log:
+    variable: stop_label
+    field: veto_q
+    bins: {low: 1, high: 20000000, n: 200, log: True} # e
+
+  mip_score:
+    variable: mip_score
+    bins: {low: -2, high: 2, n: 300}
+
+  proton_score:
+    variable: proton_score
+    bins: {low: -1, high: 1, n: 300}
+
+  mip_dqdx_score:
+    variable: profile_mip_dqdx_score
+    bins: {low: -50, high: 5, n: 300}
+
+  proton_dqdx_score:
+    variable: profile_proton_dqdx_score
+    bins: {low: -30, high: 30, n: 300}
+
+  mip_mcs_score:
+    variable: profile_mip_mcs_score
+    bins: {low: -100, high: 2, n: 300}
+
+  proton_mcs_score:
+    variable: profile_proton_mcs_score
+    bins: {low: -100, high: 2, n: 300}
+
+  mip_dqdx_score_mean:
+    variable: profile_mip_dqdx_score_mean
+    bins: {low: -3, high: 1, n: 400}
+
+  proton_dqdx_score_mean:
+    variable: profile_proton_dqdx_score_mean
+    bins: {low: -3, high: 1, n: 400}
+
+  mip_mcs_score_mean:
+    variable: profile_mip_mcs_score_mean
+    bins: {low: -3, high: 1, n: 400}
+
+  proton_mcs_score_mean:
+    variable: profile_proton_mcs_score_mean
+    bins: {low: -3, high: 1, n: 400}
 
   tagged_energy:
     variable: michel_label
     field: michel_e
-    bins: {low: -1000, high: 100000, n: 101} # 1MeV
+    bins: {low: -1000, high: 100000, n: 202} # keV
+
+  tagged_energy_smear:
+    variable: michel_e_smear
+    bins: {low: -1000, high: 100000, n: 202} # keV
+
+  tagged_nhit:
+    variable: michel_label
+    field: michel_nhit
+    bins: {low: 0, high: 500, n: 500}
+
+  delayed_sig:
+    variable: delayed_sig
+    bins: {low: 10, high: 100000, n: 100, log: True}
+
+  delayed_ampl:
+    variable: delayed_ampl
+    bins: {low: 1, high: 250, n: 100, log: True}
+
+  delayed_sum:
+    variable: delayed
+    field: sum
+    bins: {low: 1, high: 500, n: 100, log: True}
+
+  prompt_factor:
+    variable: prompt_factor
+    bins: {low: 1, high: 5000, n: 100, log: True}
+
+  prompt_ampl:
+    variable: prompt_ampl
+    bins: {low: 1, high: 2000, n: 100, log: True}
+
+  prompt_sum:
+    variable: prompt
+    field: sum
+    bins: {low: 1, high: 5000, n: 100, log: True}
 
   delayed_time:
-    variable: delayed
-    field: delay
-    bins: {low: -1000, high: 100000, n: 1010} # 10ns
+    variable: delayed_time
+    bins: [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04]
+
+  singlet_fraction:
+    variable: fit
+    field: fraction
+    bins: {low: 0, high: 1, n: 100}
+
+  tau_t:
+    variable: fit
+    field: tau_t
+    bins: {low: 0, high: 1600, n: 200} # ns
+
+  true_delay:
+    variable: true_delay
+    bins: [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04]
+    
+  true_michel_de:
+    variable: true_michel_de
+    bins: {low: 0, high: 50.0e+3, n: 100}
+
+  prompt_sum_v_delayed_sum:
+    variable: [delayed, prompt]
+    field: ['sum', 'sum']
+    bins:
+     - {low: 1, high: 500, n: 100, log: True}
+     - {low: 1, high: 5000, n: 100, log: True}
+
+  delayed_sum_v_delayed_ampl:
+    variable: [delayed_ampl, delayed]
+    field: [null, 'sum']
+    bins:
+     - {low: 1, high: 250, n: 100, log: True}
+     - {low: 1, high: 500, n: 100, log: True}
+
+  delayed_time_v_true_delay:
+    variable: [delayed_time, true_delay]
+    bins:
+      - [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04]
+      - [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04]      
+
+  prompt_energy:
+    variable: prompt_energy
+    bins: {low: 1, high: 30000, n: 100, log: True} # pe
 
   delayed_energy:
-    loop: delayed
     variable: delayed_energy
-    bins: {low: -1000, high: 100000, n: 1010} # 1MeV
+    bins: {low: 1, high: 10000, n: 100, log: True} # pe
 
-  delayed_time_energy_correlation:
+  tagged_energy_v_delayed_energy:
+    variable:
+     - delayed_energy
+     - michel_label
+    field:
+     - null
+     - michel_e
+    bins:
+      - {low: 1, high: 10000, n: 100, log: True} # pe
+      - {low: -1000, high: 100000, n: 202} # keV
+
+  delayed_time_v_delayed_energy:
+    variable:
+      - delayed_energy
+      - fit
+    field:
+      - null
+      - delayed_ns
+    bins:
+      - {low: 1, high: 10000, n: 100, log: True} # pe
+      - [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04]      
+
+  delayed_time_v_delayed_sum:
     variable:
       - delayed
-      - delayed_energy
+      - fit
     field:
-      - delay
-      - null
+      - 'sum'
+      - delayed_ns
     bins:
-      - {low: -1000, high: 100000, n: 101}
-      - {low: -1000, high: 100000, n: 101}
+      - {low: 1, high: 500, n: 100, log: True}
+      - [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+03]
 
-  proton_score:
-    loop: stop_label
-    variable: proton_score
-    bins: {low: -5, high: 5, n: 1001}
+  #min_align_v_delayed_sum:
+  #  variable:
+  #    - delayed
+  #    - min_align
+  #  field:
+  #    - 'sum'
+  #    - null
+  #  bins:
+  #    - {low: 1, high: 500, n: 100, log: True}
+  #    - {low: 0, high: 256, n: 256}
+
+  cos_theta:
+    variable: cos_theta
+    bins: {low: -1, high: 1, n: 200}
+
+  muon_theta:
+    variable: muon_theta
+    bins: {low: -1, high: 1, n: 200}
+
+  prompt_acc:
+    variable: prompt_acc
+    bins: {low: 0, high: 1, n: 100}
+
+  delayed_acc:
+    variable: delayed_acc
+    bins: {low: 0, high: 1, n: 100}
+
+  stop_pt:
+    variable: [stop_x, stop_y, stop_z, delayed_time]
+    bins:
+      - {low: -310.38, high: 310.38, n: 2} # mm
+      - {low: -620.76, high: 620.76, n: 4} # mm
+      - {low: -310, high: 310, n: 4} # mm
+      - [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04]
+
+  stop_xy:
+    variable: [stop_x, stop_y, stop_z]
+    bins:
+      - {low: -310.38, high: 310.38, n: 70} # mm
+      - {low: -620.76, high: 620.76, n: 140} # mm
+      - {low: -310, high: 310, n: 70} # mm
+
+  dqdx:
+    variable: [dqdx, rr]
+    bins:
+      - {low: 0, high: 50.0e+3, n: 100}
+      - {low: -30, high: 1500, n: 153}
+
+  dqdx_smear:
+    variable: [dqdx_smear, rr]
+    bins:
+      - {low: 0, high: 50.0e+3, n: 100}
+      - {low: -30, high: 1500, n: 153}
+
+  dndx:
+    variable: [dndx, rr]
+    bins:
+      - {low: 0, high: 2, n: 100}
+      - {low: -30, high: 1500, n: 153}
+
 
 variables:
-  # Events passing the stopping muon selection and ID'd as Michel decays
-  reco_michel:
-    expr: "stop_label['sel'] & michel_label['michel_flag'] & (numpy.sum(michel_label['muon_dir'] * michel_label['michel_dir'], axis=-1) > -0.99)"
-  # Events passing the stopping muon selection and *not* ID'd as Michel decays
-  reco_capt:
-    expr: "stop_label['sel'] & ~michel_label['michel_flag'] & (numpy.sum(michel_label['muon_dir'] * michel_label['michel_dir'], axis=-1) > -0.99)"
-
-  # Events reconstructed as Michels that are actual stopping muons with Michel decays
-  true_michel:
-    expr: "reco_michel & capture_truth['michel'] & stop_truth['sel']"
-  # Events reconstructed as captures that are actual stopping mu- without a Michel decay
-  true_capt:
-    expr: "reco_capt & (capture_truth['stopping_pdg_id'] == 13) & ~capture_truth['michel'] & stop_truth['sel']"
-
-  # Backgrounds contributing to reconstructed Michels
-  bkg_michel_capt:
-    expr: "reco_michel & (capture_truth['stopping_pdg_id'] == 13) & ~capture_truth['michel'] & stop_truth['sel']"
-  bkg_michel_proton:
-    expr: "reco_michel & (capture_truth['stopping_pdg_id'] == 2212)"
-  bkg_michel_muon:
-    expr: "reco_michel & (numpy.abs(capture_truth['stopping_pdg_id']) == 13) & ~stop_truth['sel']"
-  bkg_michel_other:
-    expr: "reco_michel & ~(true_michel | bkg_michel_capt | bkg_michel_proton | bkg_michel_muon)"
-
-  # Backgrounds contributing to reconstructed captures
-  bkg_capt_michel:
-    expr: "reco_capt & capture_truth['michel'] & stop_truth['sel']"
-  bkg_capt_proton:
-    expr: "reco_capt & (capture_truth['stopping_pdg_id'] == 2212)"
-  bkg_capt_muon:
-    expr: "reco_capt & (numpy.abs(capture_truth['stopping_pdg_id']) == 13) & ~stop_truth['sel']"
-  bkg_capt_other:
-    expr: "reco_capt & ~(true_capt | bkg_capt_michel | bkg_capt_proton | bkg_capt_muon)"
-
-  # Events that have a track stopping in the detector, but have a dQ/dx profile consistent with a proton
-  reco_proton:
-    expr: "stop_label['stop'] & (stop_label['muon_loglikelihood_mean'] - stop_label['proton_loglikelihood_mean'] < 0.2576) & (stop_label['proton_loglikelihood_mean'] - stop_label['mip_loglikelihood_mean'] > 0)"
+  #min_align:
+  #  expr: "align['sample_idx'].min(axis=(-1,-2,-3,-4))"
+  #  filt: False
 
   # Variables that we also want to extract, but require a bit more manipulation
-  delayed_energy:
-    expr: "delayed['ampl'].sum(axis=-1).sum(axis=-1)"
+  run:
+    expr: "2 if thresholds == 'high' and light_samples == 1024 else 1"
     filt: False
-  proton_score:
-    expr: "stop_label['muon_loglikelihood_mean'] - stop_label['proton_loglikelihood_mean']"
+  prompt_factor:
+    expr: "numpy.abs(prompt['terms']).sum(axis=(-1,-2,-3))"
+    filt: False
+  delayed_time:
+    expr: "delayed['delay']" #"fit['delayed_ns']"
+    filt: False
+  is_mc:
+    expr: "False if capture_truth is None else True"
+    filt: False
+  prompt_energy:
+    expr: "0.1 * fit['prompt_f'] * fit['pe_vis'] / fit['prompt_acc'].sum(axis=(-1,-2)).clip(1e-300,None)"
+    filt: False    
+  delayed_energy:
+    expr: "0.1 * (1-fit['prompt_f']) * fit['pe_vis'] / fit['delayed_acc'].sum(axis=(-1,-2)).clip(1e-300,None)"
+    filt: False
+  michel_e_smear:
+    expr: "michel_label['michel_e'] + 3000 / 0.4796 * 23.6/1e3 * numpy.random.normal(scale=numpy.sqrt(michel_label['michel_nhit'].clip(1,None)), size=michel_label['michel_e'].shape)"
+    filt: False    
+  delayed_sig:
+    expr: "delayed['sig']"
+    filt: False
+  delayed_ampl:
+    expr: "delayed['ampl']"
+    filt: False
+  prompt_ampl:
+    expr: "prompt['ampl']"
+    filt: False    
+  prompt_sig:
+    expr: "prompt['sig']"
+    filt: False    
+  cos_theta:
+    expr: "numpy.sum(michel_label['muon_dir'] * michel_label['michel_dir'], axis=-1)"
+    filt: False
+  muon_theta:
+    expr: "michel_label['muon_dir'][:,1]"
+    filt: False    
+  stop_x:
+    expr: "michel_label['stop_pt'][:,0]"
+    filt: False
+  stop_y:
+    expr: "michel_label['stop_pt'][:,1]"
+    filt: False
+  stop_z:
+    expr: "michel_label['stop_pt'][:,2]"
+    filt: False
+  dqdx:
+    expr: "profile['profile_dqdx'] * (profile['profile_n'] > 0)"
+    filt: False
+  dqdx_smear:
+    expr: "numpy.where((profile['profile_n'] > 0), profile['profile_dqdx'] * numpy.random.normal(size=profile['profile_dqdx'].shape, loc=1, scale=0.23 / np.sqrt(profile['profile_n'].clip(1,None))), 0)"
+    filt: False    
+  dndx:
+    expr: "profile['profile_n'] / numpy.clip(profile['profile_dx'], 1e-300, None)"
+    filt: False
+  rr:
+    expr: "profile['profile_rr'] * (profile['profile_n'] > 0) + -50 * (profile['profile_n'] == 0)"
+    filt: False
+  prompt_acc:
+    expr: "fit['prompt_acc'].sum(axis=(-1,-2))"
+    filt: False
+  delayed_acc:
+    expr: "fit['delayed_acc'].sum(axis=(-1,-2))"
     filt: False
   true_delay:
-    expr: "michel_track['t0'][:,0] - stopping_track['t0'][:,0]"
+    expr: "(michel_track['t0'][:,0] - stopping_track['t0'][:,0]) * 1e3" # convert us -> ns
     filt: False
+  true_michel_de:
+    expr: "michel_track['dE'].sum(axis=-1)"
+  mip_score:
+    expr: "(stop_label['mip_loglikelihood_mean'] - stop_label['muon_loglikelihood_mean']) * (stop_label['mip_loglikelihood_mean'] != 0.0) + 9999*(stop_label['mip_loglikelihood_mean'] == 0.0)"
+    filt: False
+  proton_score:
+    expr: "(stop_label['proton_loglikelihood_mean'] - stop_label['muon_loglikelihood_mean']) * (stop_label['proton_loglikelihood_mean'] != 0.0) + 9999*(stop_label['proton_loglikelihood_mean'] == 0.0)"
+    filt: False
+  profile_mip_dqdx_ll:
+    expr: "np.where((profile['profile_n'] > 0) & (profile['profile_rr'] > 0) & np.isfinite(profile['mip_likelihood'][...,0]), (profile['mip_likelihood'][...,0]), 0).sum(axis=-1)"
+    filt: False    
+  profile_muon_dqdx_ll:
+    expr: "np.where((profile['profile_n'] > 0) & (profile['profile_rr'] > 0) & np.isfinite(profile['muon_likelihood'][...,0]), (profile['muon_likelihood'][...,0]), 0).sum(axis=-1)"
+    filt: False
+  profile_proton_dqdx_ll:
+    expr: "np.where((profile['profile_n'] > 0) & (profile['profile_rr'] > 0) & np.isfinite(profile['proton_likelihood'][...,0]), (profile['proton_likelihood'][...,0]), 0).sum(axis=-1)"
+    filt: False
+  profile_mip_mcs_ll:
+    expr: "np.where((profile['profile_n'] > 0) & (profile['profile_rr'] > 0) & np.isfinite(profile['mip_likelihood'][...,1]), (profile['mip_likelihood'][...,1]), 0).sum(axis=-1)"
+    filt: False    
+  profile_muon_mcs_ll:
+    expr: "np.where((profile['profile_n'] > 0) & (profile['profile_rr'] > 0) & np.isfinite(profile['muon_likelihood'][...,1]), (profile['muon_likelihood'][...,1]), 0).sum(axis=-1)"
+    filt: False    
+  profile_proton_mcs_ll:
+    expr: "np.where((profile['profile_n'] > 0) & (profile['profile_rr'] > 0) & np.isfinite(profile['proton_likelihood'][...,1]), (profile['proton_likelihood'][...,1]), 0).sum(axis=-1)"
+    filt: False    
+  #print1:
+  #  expr: "print('mip dqdx (ll)',profile_mip_dqdx_ll.min(),profile_mip_dqdx_ll.max(),
+  #               'proton dqdx (ll)',profile_proton_dqdx_ll.min(),profile_proton_dqdx_ll.max(),
+  #               'mip mcs (ll)',profile_mip_mcs_ll.min(),profile_mip_mcs_ll.max(),
+  #               'proton mcs (ll)',profile_proton_mcs_ll.min(),profile_proton_mcs_ll.max())"
+         
+  profile_mip_dqdx_score:
+    expr: "profile_mip_dqdx_ll - profile_muon_dqdx_ll"
+    filt: False    
+  profile_proton_dqdx_score:
+    expr: "profile_proton_dqdx_ll - profile_muon_dqdx_ll"
+    filt: False    
+  profile_mip_mcs_score:
+    expr: "profile_mip_mcs_ll - profile_muon_mcs_ll"
+    filt: False    
+  profile_proton_mcs_score:
+    expr: "profile_proton_mcs_ll - profile_muon_mcs_ll"
+    filt: False
+
+  profile_mip_dqdx_score_mean:
+    expr: "profile_mip_dqdx_score / (profile['profile_rr'] > 0).sum(axis=-1).clip(1,None)"
+    filt: False    
+  profile_proton_dqdx_score_mean:
+    expr: "profile_proton_dqdx_score / (profile['profile_rr'] > 0).sum(axis=-1).clip(1,None)"  
+    filt: False    
+  profile_mip_mcs_score_mean:
+    expr: "profile_mip_mcs_score / (profile['profile_rr'] > 0).sum(axis=-1).clip(1,None)"    
+    filt: False    
+  profile_proton_mcs_score_mean:
+    expr: "profile_proton_mcs_score / (profile['profile_rr'] > 0).sum(axis=-1).clip(1,None)"      
+    filt: False
+
+
+  # ~~~ Cut variables ~~~
+  stop_pt_veto: # manual veto regions near anomalous number of selected stopping events
+    expr: "((run == 1) & (stop_z < 0) & ((
+            (stop_x < -310.38+75.4) & (stop_x > -310.38)
+          & (stop_y < -620.76+75.4) & (stop_y > -620.76))
+         | ((stop_x < 62.1+26.60) & (stop_x > 62.1)
+          & (stop_y < 97.55+26.60/2) & (stop_y > 97.55))
+         | ((stop_x < 177.36+44.34) & (stop_x > 177.36)
+          & (stop_y < 124.15+26.60) & (stop_y > 124.15)) & (stop_z < 0))
+       | ((run == 1) & (stop_z > 0) & ((
+            (stop_x < 310.38) & (stop_x > 0) 
+          & (stop_y < -310.38+26.60) & (stop_y > -310.38))
+         | ((stop_x < -93.11+35.47) & (stop_x > -93.11)
+          & (stop_y < -62.08+26.60) & (stop_y > -62.08))
+         | ((stop_x < 53.2) & (stop_x > -26.60)
+          & (stop_y < -620.76+310.38+26.60) & (stop_y > -620.76))))
+       | ((run == 2) & (stop_z < 0) & ((
+            (stop_x < 0) & (stop_x > -310.38)
+          & (stop_y < -310.38+2*26.60) & (stop_y > -310.38))
+         | ((stop_x < 177.36+44.34) & (stop_x > 177.36)
+          & (stop_y < 124.15+26.60) & (stop_y > 124.15))))
+       | ((run == 2) & (stop_z > 0) & ((
+            (stop_x < 310.38) & (stop_x > 0)
+          & (stop_y < -310.38+26.60) & (stop_y > -310.38))
+         | ((stop_x < -93.11+35.47) & (stop_x > -93.11)
+          & (stop_y < -62.08+26.60) & (stop_y > -62.08))
+         | ((stop_x < 0) & (stop_x > -310.38)
+          & (stop_y < 310.38+2*26.60) & (stop_y > 310.38))
+         | ((stop_x < 53.2) & (stop_x > 0)
+          & (stop_y < -620.76+310.38+26.60) & (stop_y > -620.76)))))"
+    filt: False
+  fid_cut: # expand fiducial cut
+    expr: "((numpy.abs(stop_z) > 31.04) & (numpy.abs(stop_z) < 310 - 62.08)
+          & (numpy.abs(stop_x) < 310.38 - 62.08)
+          & (stop_y > -620.76 + 62.08) & (stop_y < 620.76 - 62.08*2))"
+    filt: False
+  angle_veto:
+    expr: "(muon_theta <= 0)"
+    filt: False
+  stop_cut:
+    expr: "stop_label['stop'] & ~((stop_x == 0.0) & (stop_y == 0.0) & (stop_z == 0.0))"
+    filt: False
+  muon_cut:
+    expr: "stop_label['sel'] & (mip_score < 0) & (proton_score < -0.15)"
+    filt: False
+  veto:
+    expr: "angle_veto | stop_pt_veto | (michel_label['michel_e'] > 100000) | (stop_label['remaining_e'] > 100000)"
+    filt: False
+  michel_cut:
+    expr: "michel_label['michel_flag'] & (michel_label['michel_nhit'] > 10)"
+    filt: False
+  light_cut:
+    expr: "(delayed_time > 340) & (prompt_factor > 150) & (delayed['sum'] > 50)"
+  in_charge_ratio_time_window:
+    expr: "(delayed_time > 340) & (((run == 2) & (delayed_time < 9000)) | ((run == 1) & (delayed_time < 1460)))"
+  in_michel_plus_time_window:
+    expr: "(((run == 2) & (delayed_time < 9000) & (delayed_time > 3000)) | ((run == 1) & (delayed_time > 3000) & (delayed_time < 9000)))"
+  # ~~~ ~~~
+
+  # ~~~ Truth variables ~~~
+  poor_reco:
+    expr: "(numpy.abs(delayed_time - true_delay) > 100) | (delayed_time == 0)"
+    filt: False
+  true_michel:
+    expr: "capture_truth['michel'] & stop_truth['sel']"
+  true_michel_minus:
+    expr: "true_michel & (capture_truth['stopping_pdg_id'] == 13)"
+  true_michel_plus:
+    expr: "true_michel & (capture_truth['stopping_pdg_id'] == -13)"
+  true_capt:
+    expr: "(capture_truth['stopping_pdg_id'] == 13) & ~capture_truth['michel'] & stop_truth['sel']"
+  true_bkg_stop:
+    expr: "(~true_michel & ~true_capt & stop_truth['stop'])"
+  true_bkg_stop_proton:
+    expr: "true_bkg_stop & (capture_truth['stopping_pdg_id'] == 2212)"
+  true_bkg_stop_other:
+    expr: "true_bkg_stop & ~true_bkg_stop_proton"
+  true_bkg_nonstop:
+    expr: "(~true_michel & ~true_capt & ~stop_truth['stop'])"
+  # ~~~ ~~~
+
+  # ~~~ Selection filters ~~~
+  reco_stop:
+    expr: "stop_cut"
+  reco_stop_true_michel:
+    expr: "reco_stop & true_michel"
+  reco_stop_true_michel_plus:
+    expr: "reco_stop & true_michel_plus"
+  reco_stop_true_michel_minus:
+    expr: "reco_stop & true_michel_minus"
+  reco_stop_true_capt:
+    expr: "reco_stop & true_capt"
+  reco_stop_bkg_stop:
+    expr: "reco_stop & true_bkg_stop"
+  reco_stop_bkg_stop_proton:
+    expr: "reco_stop & true_bkg_stop_proton"
+  reco_stop_bkg_stop_other:
+    expr: "reco_stop & true_bkg_stop_other"
+  reco_stop_bkg_nonstop:
+    expr: "reco_stop & true_bkg_nonstop"
+
+  reco_muon:
+    expr: "reco_stop & muon_cut"
+  reco_muon_true_michel:
+    expr: "reco_muon & true_michel"
+  reco_muon_true_michel_plus:
+    expr: "reco_muon & true_michel_plus"
+  reco_muon_true_michel_minus:
+    expr: "reco_muon & true_michel_minus"
+  reco_muon_true_capt:
+    expr: "reco_muon & true_capt"
+  reco_muon_bkg_stop:
+    expr: "reco_muon & true_bkg_stop"
+  reco_muon_bkg_stop_proton:
+    expr: "reco_muon & true_bkg_stop_proton"
+  reco_muon_bkg_stop_other:
+    expr: "reco_muon & true_bkg_stop_other"
+  reco_muon_bkg_nonstop:
+    expr: "reco_muon & true_bkg_nonstop"
+  
+  proton_sideband:
+    expr: "stop_cut & (proton_score > 0) & (mip_score < -0.25)"
+  proton_sideband_true_michel:
+    expr: "proton_sideband & true_michel"
+  proton_sideband_true_michel_plus:
+    expr: "proton_sideband & true_michel_plus"
+  proton_sideband_true_michel_minus:
+    expr: "proton_sideband & true_michel_minus"
+  proton_sideband_true_capt:
+    expr: "proton_sideband & true_capt"
+  proton_sideband_bkg_stop:
+    expr: "proton_sideband & true_bkg_stop"
+  proton_sideband_bkg_stop_proton:
+    expr: "proton_sideband & true_bkg_stop_proton"
+  proton_sideband_bkg_stop_other:
+    expr: "proton_sideband & true_bkg_stop_other"
+  proton_sideband_bkg_nonstop:
+    expr: "proton_sideband & true_bkg_nonstop"
+    
+  mip_sideband:
+    expr: "stop_cut & (proton_score < 0) & (mip_score > 0)"
+  mip_sideband_true_michel:
+    expr: "mip_sideband & true_michel"
+  mip_sideband_true_michel_plus:
+    expr: "mip_sideband & true_michel_plus"
+  mip_sideband_true_michel_minus:
+    expr: "mip_sideband & true_michel_minus"
+  mip_sideband_true_capt:
+    expr: "mip_sideband & true_capt"
+  mip_sideband_bkg_stop:
+    expr: "mip_sideband & true_bkg_stop"
+  mip_sideband_bkg_stop_proton:
+    expr: "mip_sideband & true_bkg_stop_proton"
+  mip_sideband_bkg_stop_other:
+    expr: "mip_sideband & true_bkg_stop_other"
+  mip_sideband_bkg_nonstop:
+    expr: "mip_sideband & true_bkg_nonstop"    
+
+  reco_muon_veto:
+    expr: "reco_muon & ~veto"
+  reco_muon_veto_true_michel:
+    expr: "reco_muon_veto & true_michel"
+  reco_muon_veto_true_michel_plus:
+    expr: "reco_muon_veto & true_michel_plus"
+  reco_muon_veto_true_michel_minus:
+    expr: "reco_muon_veto & true_michel_minus"
+  reco_muon_veto_true_capt:
+    expr: "reco_muon_veto & true_capt"
+  reco_muon_veto_bkg_stop:
+    expr: "reco_muon_veto & true_bkg_stop"
+  reco_muon_veto_bkg_stop_proton:
+    expr: "reco_muon_veto & true_bkg_stop_proton"
+  reco_muon_veto_bkg_stop_other:
+    expr: "reco_muon_veto & true_bkg_stop_other"
+  reco_muon_veto_bkg_nonstop:
+    expr: "reco_muon_veto & true_bkg_nonstop"
+
+  reco_michel:
+    expr: "reco_muon_veto & michel_cut"
+  reco_michel_true_michel:
+    expr: "reco_michel & true_michel"
+  reco_michel_true_michel_plus:
+    expr: "reco_michel & true_michel_plus"
+  reco_michel_true_michel_minus:
+    expr: "reco_michel & true_michel_minus"
+  reco_michel_true_capt:
+    expr: "reco_michel & true_capt"
+  reco_michel_bkg_stop:
+    expr: "reco_michel & true_bkg_stop"
+  reco_michel_bkg_stop_proton:
+    expr: "reco_michel & true_bkg_stop_proton"
+  reco_michel_bkg_stop_other:
+    expr: "reco_michel & true_bkg_stop_other"
+  reco_michel_bkg_nonstop:
+    expr: "reco_michel & true_bkg_nonstop"
+
+  reco_michel_light:
+    expr: "reco_michel & light_cut & in_charge_ratio_time_window"
+  reco_michel_light_true_michel:
+    expr: "reco_michel_light & true_michel & ~poor_reco"
+  reco_michel_light_true_michel_plus:
+    expr: "reco_michel_light & true_michel_plus & ~poor_reco"
+  reco_michel_light_true_michel_minus:
+    expr: "reco_michel_light & true_michel_minus & ~poor_reco"
+  reco_michel_light_poor_reco:
+    expr: "reco_michel_light & true_michel & poor_reco"
+  reco_michel_light_true_capt:
+    expr: "reco_michel_light & true_capt"
+  reco_michel_light_bkg_stop:
+    expr: "reco_michel_light & true_bkg_stop"
+  reco_michel_light_bkg_stop_proton:
+    expr: "reco_michel_light & true_bkg_stop_proton"
+  reco_michel_light_bkg_stop_other:
+    expr: "reco_michel_light & true_bkg_stop_other"
+  reco_michel_light_bkg_nonstop:
+    expr: "reco_michel_light & true_bkg_nonstop"
+
+  reco_michel_plus_light:
+    expr: "reco_michel & light_cut & in_michel_plus_time_window"
+  reco_michel_plus_light_true_michel:
+    expr: "reco_michel_plus_light & true_michel & ~poor_reco"
+  reco_michel_plus_light_true_michel_plus:
+    expr: "reco_michel_plus_light & true_michel_plus & ~poor_reco"
+  reco_michel_plus_light_true_michel_minus:
+    expr: "reco_michel_plus_light & true_michel_minus & ~poor_reco"
+  reco_michel_plus_light_poor_reco:
+    expr: "reco_michel_plus_light & true_michel & poor_reco"
+  reco_michel_plus_light_true_capt:
+    expr: "reco_michel_plus_light & true_capt"
+  reco_michel_plus_light_bkg_stop:
+    expr: "reco_michel_plus_light & true_bkg_stop"
+  reco_michel_plus_light_bkg_stop_proton:
+    expr: "reco_michel_plus_light & true_bkg_stop_proton"
+  reco_michel_plus_light_bkg_stop_other:
+    expr: "reco_michel_plus_light & true_bkg_stop_other"
+  reco_michel_plus_light_bkg_nonstop:
+    expr: "reco_michel_plus_light & true_bkg_nonstop"
+
+  reco_nomichel:
+    expr: "reco_michel & (michel_label['michel_e'] > 75000)"
+  reco_nomichel_true_michel:
+    expr: "reco_nomichel & true_michel & ~poor_reco"
+  reco_nomichel_true_michel_plus:
+    expr: "reco_nomichel & true_michel_plus & ~poor_reco"
+  reco_nomichel_true_michel_minus:
+    expr: "reco_nomichel & true_michel_minus & ~poor_reco"
+  reco_nomichel_poor_reco:
+    expr: "reco_nomichel & true_michel & poor_reco"
+  reco_nomichel_true_capt:
+    expr: "reco_nomichel & true_capt"
+  reco_nomichel_bkg_stop:
+    expr: "reco_nomichel & true_bkg_stop"
+  reco_nomichel_bkg_stop_proton:
+    expr: "reco_nomichel & true_bkg_stop_proton"
+  reco_nomichel_bkg_stop_other:
+    expr: "reco_nomichel & true_bkg_stop_other"
+  reco_nomichel_bkg_nonstop:
+    expr: "reco_nomichel & true_bkg_nonstop"
+
+  reco_nomichel_light:
+    expr: "reco_nomichel & light_cut & in_charge_ratio_time_window"
+  reco_nomichel_light_true_michel:
+    expr: "reco_nomichel_light & true_michel & ~poor_reco"
+  reco_nomichel_light_true_michel_plus:
+    expr: "reco_nomichel_light & true_michel_plus & ~poor_reco"
+  reco_nomichel_light_true_michel_minus:
+    expr: "reco_nomichel_light & true_michel_minus & ~poor_reco"
+  reco_nomichel_light_poor_reco:
+    expr: "reco_nomichel_light & true_michel & poor_reco"
+  reco_nomichel_light_true_capt:
+    expr: "reco_nomichel_light & true_capt"
+  reco_nomichel_light_bkg_stop:
+    expr: "reco_nomichel_light & true_bkg_stop"
+  reco_nomichel_light_bkg_stop_proton:
+    expr: "reco_nomichel_light & true_bkg_stop_proton"
+  reco_nomichel_light_bkg_stop_other:
+    expr: "reco_nomichel_light & true_bkg_stop_other"
+  reco_nomichel_light_bkg_nonstop:
+    expr: "reco_nomichel_light & true_bkg_nonstop"
+    
