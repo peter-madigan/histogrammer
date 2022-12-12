@@ -143,6 +143,9 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                     const = f[path][:] if name is None else f[path][name]
 
                 globals()[c_name] = const
+
+                if verbose:
+                    print(c_name, const)
                     
         # Initialize filter operations
         var_op = dict()
@@ -170,6 +173,8 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                         dset_field = spec.get('field')
                         if dset_field:
                             globals()[dset] = globals()[dset][dset_field]
+                        if verbose:
+                            print(dset, globals()[dset].shape)
                     except Exception as e:
                         if verbose:
                             warnings.warn(f'error in {basename}/{dset} : '+str(e))
@@ -183,6 +188,8 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                         globals()[var] = var_op[var]()
                         if create_event_list and variables[var].get('filt', True):
                             event_list[var] += (np.where(globals()[var])[0] + batch.start).tolist()
+                        if verbose:
+                            print(var, globals()[var].shape)
                     except Exception as e:
                         if verbose:
                             warnings.warn(f'error in {basename}/{var} : '+str(e))
@@ -225,8 +232,8 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
             print('Error:',filepath,e)
         return index, None, None
 
-
-def save(f, filepath, hists, histograms, event_list, compression, runxrun=None):
+save_cache = dict()
+def save(f, filepath, hists, histograms, event_list, compression, runxrun=None, flush_cache=True):
     filename = os.path.basename(filepath)
 
     compression_args = dict()
@@ -266,7 +273,10 @@ def save(f, filepath, hists, histograms, event_list, compression, runxrun=None):
             if hist not in sum_grp:
                 sum_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
             else:
-                sum_grp[hist][:] = sum_grp[hist][:] + hist_dict[hist]
+                if flush_cache:
+                    sum_grp[hist][:] = sum_grp[hist][:] + hist_dict[hist] + save_cache.get(hist_name + '/' + hist, 0)
+                else:
+                    save_cache[hist_name + '/' + hist] = save_cache.get(hist_name + '/' + hist, 0) + hist_dict[hist]
                 
         if runxrun is not None:
             # maybe create new individual run dataset
@@ -361,7 +371,7 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
                         if hists is not None:
                             filepath = filepaths[ifinish]
                             pbar.desc = os.path.basename(filepath)
-                            save(f, filepath, hists, config['histograms'], event_list=None if event_list is None else events, compression=compression, runxrun=runxrun)
+                            save(f, filepath, hists, config['histograms'], event_list=None if event_list is None else events, compression=compression, runxrun=runxrun, flush_cache=len(results)==1)
                         del results[ifinish]
                         del finished[0]
 
