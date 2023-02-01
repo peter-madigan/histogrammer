@@ -38,6 +38,7 @@ Yaml spec::
         path: <path to object within input hdf5 file>
         name: <field name or attribute name to load from "path">
         attr: <bool, true if constant is to be fetched from group/dataset attribute rather than attempting to load a dataset>
+        expr: <str, a python expression to evaluate once instead of loading from a file, other constants defined in namespace can be used locally, optional>
 
     histograms:
         <histogram name>:
@@ -78,7 +79,6 @@ global H5FLOW_MPI
 H5FLOW_MPI = False
 from h5flow.data import H5FlowDataManager
 
-
 def generate_bins(spec):
     if isinstance(spec, dict):
         if 'log' in spec and spec['log'] == True:
@@ -98,15 +98,18 @@ def only_valid(maybe_masked_arr, fill=0):
             else maybe_masked_arr.filled(fill))
 
 
-def generate_histograms(index, filepath, histograms, *args, datasets=None, variables=None, constants=None, batch_size=None, imports=None, create_event_list=False, verbose=True, **kwargs):
+def generate_histograms(lock, index, input_filepath, output_filepath, histograms, *args, datasets=None, variables=None, constants=None, batch_size=None, imports=None, event_list_variables=None, verbose=True, runxrun=False, compression=0, **kwargs):
+    then = time.time()
+    now = time.time()
+
     if imports is not None:
         for lib in imports:
             globals()[lib] = __import__(lib)
 
     # Open the file
     try:
-        f = H5FlowDataManager(filepath, 'r', mpi=False)
-        basename = os.path.basename(filepath)
+        f = H5FlowDataManager(input_filepath, 'r', mpi=False)
+        basename = os.path.basename(input_filepath)
 
         # Initialize histogram(s)
         bins = dict()
@@ -119,7 +122,7 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                 print(hist, histograms[hist])
             if variables:
                 for var in variables:
-                    if variables[var].get('filt',True):
+                    if variables[var].get('filt', True):
                         hists[hist][var] = np.zeros([len(b)-1 for b in bins[hist]])
 
         # Initialize loop
@@ -133,14 +136,20 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
         # Initialize constant values
         if constants:
             for c_name, c_config in constants.items():
-                path = c_config['path']
-                name = c_config.get('name')
+                path = c_config.get('path', None)
+                name = c_config.get('name', None)
                 attr = c_config.get('attr', False)
+                expr = c_config.get('expr', None)
 
                 if attr == True:
                     const = f[path].attrs[name]
                 else:
-                    const = f[path][:] if name is None else f[path][name]
+                    if expr is not None:
+                        const = eval(expr)
+                    elif path is not None:
+                        const = f[path][:] if name is None else f[path][name]
+                    else:
+                        raise RuntimeError(f'Could not parse constant {c_name}: {c_config}')
 
                 globals()[c_name] = const
 
@@ -158,11 +167,11 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
 
         # Run loop
         event_list = dict()
-        if variables and create_event_list:
-            for var in variables:
+        if variables and event_list_variables:
+            for var in event_list_variables:
                 if variables[var].get('filt', True):
                     event_list[var] = []
-                
+
         for batch in batches:
             # Load data
             if datasets is not None:
@@ -186,10 +195,10 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                     # Apply variable function
                     try:
                         globals()[var] = var_op[var]()
-                        if create_event_list and variables[var].get('filt', True):
+                        if event_list_variables and variables[var].get('filt', True) and var in event_list_variables:
                             event_list[var] += (np.where(globals()[var])[0] + batch.start).tolist()
                         if verbose:
-                            print(var, globals()[var].shape)
+                            print(var, globals()[var].shape, globals()[var].min(), globals()[var].max())
                     except Exception as e:
                         if verbose:
                             warnings.warn(f'error in {basename}/{var} : '+str(e))
@@ -226,71 +235,115 @@ def generate_histograms(index, filepath, histograms, *args, datasets=None, varia
                         warnings.warn(f'error filling {basename}/{hist} : '+str(e))
 
         # Return histograms
-        return index, hists.copy(), event_list.copy()
+        now = time.time()
+        print('loop on:', now-then)
+        then = now
+
+        lock.acquire()
+        try:
+            print(input_filepath, event_list)
+            save(
+                output_filepath,
+                input_filepath,
+                hists,
+                histograms,
+                event_list=None if event_list is None else event_list,
+                compression=compression,
+                runxrun=runxrun,
+                verbose=verbose)
+        except Exception as e:
+            if verbose:
+                print('Error:', input_filepath, e)
+        finally:
+            lock.release()
+
+        #return index, hists.copy(), event_list.copy()
+        return index, None, None
     except Exception as e:
         if verbose:
-            print('Error:',filepath,e)
+            print('Error:', input_filepath, e)
         return index, None, None
 
 save_cache = dict()
-def save(f, filepath, hists, histograms, event_list, compression, runxrun=None, flush_cache=True):
+def save(outpath, filepath, hists, histograms, event_list, compression, runxrun=None, flush_cache=True, verbose=False):
+    then = time.time()
+    now = time.time()
+    
     filename = os.path.basename(filepath)
+    if verbose:
+        print(f'Saving {filename}')
 
-    compression_args = dict()
-    if compression > 0:
-        compression_args['compression'] = 'gzip'
-        compression_args['compression_opts'] = compression
+    with h5py.File(outpath, 'a') as f:
 
-    # maybe create new event list
-    if event_list is not None:
-        if 'events' not in f:
-            f.create_group('events')
+        compression_args = dict()
+        if compression > 0:
+            compression_args['compression'] = 'gzip'
+            compression_args['compression_opts'] = compression
+            if verbose:
+                print(f'With compression: {compression_args}')
 
-        for filt in event_list:
-            if filt not in f['events']:
-                f['events'].create_group(filt)
+        # maybe create new event list
+        if event_list is not None:
+            if 'events' not in f:
+                f.create_group('events')
 
-            if filename not in f['events'][filt]:
-                f['events'][filt].create_dataset(filename, data=np.array(event_list[filt]), **compression_args)
+            for filt in event_list:
+                if filt not in f['events']:
+                    f['events'].create_group(filt)
 
-    for hist_name in hists:
-        hist_config = histograms[hist_name]
-        # maybe create new histogram entry
-        if hist_name not in f:
-            f.create_group(hist_name)
-            f[hist_name].attrs['config'] = str(hist_config)
-            for i,b in enumerate(hist_config['bins']):
-                f[hist_name].attrs[f'bins{i}'] = generate_bins(b)
+                if filename not in f['events'][filt]:
+                    if verbose:
+                        print(f'\t{filename}: {len(event_list[filt])} events in event list')
+                    f['events'][filt].create_dataset(filename, data=np.array(event_list[filt]), **compression_args)
 
-            f[hist_name].create_group('sum')
-            f[hist_name].create_group('run')
+        for hist_name in hists:
+            hist_config = histograms[hist_name]
+            # maybe create new histogram entry
+            if hist_name not in f:
+                if verbose:
+                    print(f'\tCreating new histogram {hist_name}')
+            
+                f.create_group(hist_name)
+                f[hist_name].attrs['config'] = str(hist_config)
+                for i,b in enumerate(hist_config['bins']):
+                    f[hist_name].attrs[f'bins{i}'] = generate_bins(b)
 
-        hist_dict = hists[hist_name]
+                f[hist_name].create_group('sum')
+                f[hist_name].create_group('run')
 
-        # update global histograms
-        sum_grp = f[hist_name]['sum']
-        for hist in hist_dict:
-            if hist not in sum_grp:
-                sum_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
-            else:
-                if flush_cache:
-                    sum_grp[hist][:] = sum_grp[hist][:] + hist_dict[hist] + save_cache.get(hist_name + '/' + hist, 0)
-                else:
-                    save_cache[hist_name + '/' + hist] = save_cache.get(hist_name + '/' + hist, 0) + hist_dict[hist]
-                
-        if runxrun is not None:
-            # maybe create new individual run dataset
-            if filename not in f[hist_name]['run']:
-                f[hist_name]['run'].create_group(filename)
-                f[hist_name]['run'][filename].attrs['filepath'] = filepath
+            hist_dict = hists[hist_name]
 
-            # update run-level histograms
-            run_grp = f[hist_name]['run'][filename]
+            # update global histograms
+            sum_grp = f[hist_name]['sum']
             for hist in hist_dict:
-                if hist not in run_grp:
-                    run_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
+                if hist not in sum_grp:
+                    sum_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
                 else:
-                    run_grp[hist][:] = run_grp[hist][:] + hist_dict[hist]
+                    if flush_cache:
+                        if np.any(save_cache.get(hist_name + '/' + hist, 0) + hist_dict[hist] != 0):
+                            sum_grp[hist][:] = sum_grp[hist][:] + hist_dict[hist] + save_cache.get(hist_name + '/' + hist, 0)
+                    else:
+                        save_cache[hist_name + '/' + hist] = save_cache.get(hist_name + '/' + hist, 0) + hist_dict[hist]
+                if verbose:
+                    print(f'\tAdded {hist_dict[hist].sum()} new entries to {hist_name}/sum/{hist}')
+
+            if runxrun is not None:
+                # maybe create new individual run dataset
+                if filename not in f[hist_name]['run']:
+                    f[hist_name]['run'].create_group(filename)
+                    f[hist_name]['run'][filename].attrs['filepath'] = filepath
+
+                # update run-level histograms
+                run_grp = f[hist_name]['run'][filename]
+                for hist in hist_dict:
+                    if hist not in run_grp:
+                        run_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
+                    else:
+                        run_grp[hist][:] = run_grp[hist][:] + hist_dict[hist]
+
+    now = time.time()
+    print('save:', now-then)
+    then = now
 
 finished = []
 def pool_callback(result):
@@ -341,39 +394,55 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
     with h5py.File(outpath, 'a') as f:
         f['/'].attrs['config'] = str(config)
 
-        processes = processes if processes is not None else multiprocessing.cpu_count()
-        processes = min(processes, len(filepaths))
+    processes = processes if processes is not None else multiprocessing.cpu_count()
+    processes = min(processes, len(filepaths))
 
-        print(f'Running on {processes} processes...')
-        global finished
+    print(f'Running on {processes} processes...')
+    global finished
+    with multiprocessing.Manager() as mgr:
+        lock = mgr.Lock()
+        
         with multiprocessing.Pool(processes) as p:
             results = {}
             pbar = tqdm.tqdm(enumerate(filepaths), smoothing=0, total=len(filepaths))
-            for i,filepath in pbar:
-                results[i] = p.apply_async(generate_histograms,
+            i = 0
+            while True:
+                #for i,filepath in pbar:
+                if i < len(filepaths):
+                    filepath = filepaths[i]
+                    results[i] = p.apply_async(generate_histograms,
                                            tuple(),
                                            dict(
+                                               lock=lock,
                                                index=i,
-                                               filepath=filepath,
+                                               input_filepath=filepath,
+                                               output_filepath=outpath,
                                                histograms=config['histograms'],
                                                datasets=config['datasets'],
                                                variables=config.get('variables'),
                                                constants=config.get('constants'),
                                                batch_size=batch_size,
-                                               create_event_list=event_list is not None,
+                                               event_list_variables=event_list,
                                                verbose=verbose,
+                                               runxrun=runxrun,
+                                               compression=compression,
                                                imports=config.get('import')),
                                            callback=pool_callback, error_callback=pool_error_callback)
+                    i += 1
 
-                while len(results) >= processes or ((i == len(filepaths)-1) and (len(results) > 0)):
-                    while len(finished):
+                while len(results) >= processes or ((i == len(filepaths)) and (len(results) > 0)):
+                    if len(finished):
                         ifinish,hists,events = finished[0]
                         if hists is not None:
                             filepath = filepaths[ifinish]
                             pbar.desc = os.path.basename(filepath)
-                            save(f, filepath, hists, config['histograms'], event_list=None if event_list is None else events, compression=compression, runxrun=runxrun, flush_cache=len(results)==1)
+                            save(output_filepath, filepath, hists, config['histograms'], event_list=None if event_list is None else events, compression=compression, runxrun=runxrun, flush_cache=len(results)==1, verbose=verbose)
                         del results[ifinish]
                         del finished[0]
+                        pbar.update(1)
+
+                if (i == len(filepaths)) and (len(results) == 0):
+                    break
 
 
 if __name__ == '__main__':
@@ -390,9 +459,9 @@ if __name__ == '__main__':
         help='''number of parallel processes (defaults to number of cpus detected)''')
     parser.add_argument('--batch_size', '-b', type=int, default=None,
         help='''batch size for loop (optional)''')
-    parser.add_argument('--compression', type=int, default=1,
+    parser.add_argument('--compression', type=int, default=0,
                         help='''level of compression to apply to output''')
-    parser.add_argument('--event_list', '-e', action='store_true', default=None,
+    parser.add_argument('--event_list', '-e', nargs='+', default=None,
                         help='''dump a list of events matching each filter to the file''')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='''create more output''')
