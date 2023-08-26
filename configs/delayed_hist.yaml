@@ -1,10 +1,133 @@
 # Generates the necessary histograms for the Module 0 muon capture analysis
+entry-list:
+  #all: [
+  #  ev_id, ev_unix, ev_pps_start, ev_pps_end,  
+  #  mip_score, proton_score, profile_mip_mcs_score_mean, profile_proton_mcs_score_mean,
+  #  tagged_energy, tagged_nhit, bkg_nhit, muon_theta, muon_phi, muon_eta,
+  #  cos_theta, muon_t, muon_q, muon_n, start_x, start_y, start_z, stop_x, stop_y, stop_z,
+  #  michel_stop_x, michel_stop_y, michel_stop_z,    
+  #  prompt_ampl, prompt_sum, prompt_sum_res, prompt_acc, delayed_time, delayed_sum, delayed_ampl, delayed_acc,
+  #  prompt_acc_ch, delayed_acc_ch, max_light_dt, imin_align_ns_nan, align_sample_idx_nan,
+  #  prompt_sum_ch, delayed_sum_ch, prompt_ampl_ch, delayed_ampl_ch, prompt_pca_terms,
+  #  through_going_muon_range, through_going,
+  #  true_michel, true_michel_plus, true_michel_minus, true_capt,
+  #  true_bkg_proton, true_bkg_nonstop_muon, true_bkg_stop_muon, true_bkg_neutron, true_bkg_pion, true_bkg_shower, true_bkg_other,
+  #  true_muon_de, true_muon_charge, true_muon_light,
+  #  true_michel_ke, true_michel_de, true_michel_charge, true_michel_light, true_delay,
+  #  true_stop_x, true_stop_y, true_stop_z
+  #  ]
+  short_stopping_michel: [
+    ev_id, ev_unix, ev_pps_start, ev_pps_end,
+    mip_score, proton_score, profile_mip_mcs_score_mean, profile_proton_mcs_score_mean,
+    tagged_energy, tagged_nhit, bkg_nhit, muon_theta, muon_phi, muon_eta,
+    cos_theta, muon_t, muon_q, muon_n, start_x, start_y, start_z, stop_x, stop_y, stop_z,
+    michel_stop_x, michel_stop_y, michel_stop_z,
+    prompt_ampl, prompt_sum, prompt_sum_res, prompt_acc, delayed_time, delayed_sum, delayed_ampl, delayed_acc,
+    prompt_acc_ch, delayed_acc_ch, max_light_dt, imin_align_ns_nan, align_sample_idx_nan,
+    prompt_sum_ch, delayed_sum_ch, prompt_ampl_ch, delayed_ampl_ch, prompt_pca_terms,
+    through_going_muon_range, through_going,
+    swvfm_data_aligned,
+    true_michel, true_michel_plus, true_michel_minus, true_capt,
+    true_bkg_proton, true_bkg_nonstop_muon, true_bkg_stop_muon, true_bkg_neutron, true_bkg_pion, true_bkg_shower, true_bkg_other,
+    true_muon_de, true_muon_charge, true_muon_light,
+    true_michel_ke, true_michel_de, true_michel_charge, true_michel_light, true_delay,
+    true_stop_x, true_stop_y, true_stop_z
+    ]
+  reco_muon_veto: [
+    ev_id, ev_unix, ev_pps_start, ev_pps_end,  
+    mip_score, proton_score, profile_mip_mcs_score_mean, profile_proton_mcs_score_mean,
+    tagged_energy, tagged_nhit, bkg_nhit, muon_theta, muon_phi, muon_eta,
+    cos_theta, muon_t, muon_q, muon_n, start_x, start_y, start_z, stop_x, stop_y, stop_z,
+    michel_stop_x, michel_stop_y, michel_stop_z,    
+    prompt_ampl, prompt_sum, prompt_sum_res, prompt_acc, delayed_time, delayed_sum, delayed_ampl, delayed_acc,
+    prompt_acc_ch, delayed_acc_ch, max_light_dt, imin_align_ns_nan, align_sample_idx_nan,
+    prompt_sum_ch, delayed_sum_ch, prompt_ampl_ch, delayed_ampl_ch, prompt_pca_terms,
+    through_going_muon_range, through_going,
+    true_michel, true_michel_plus, true_michel_minus, true_capt,
+    true_bkg_proton, true_bkg_nonstop_muon, true_bkg_stop_muon, true_bkg_neutron, true_bkg_pion, true_bkg_shower, true_bkg_other,
+    true_muon_de, true_muon_charge, true_muon_light,
+    true_michel_ke, true_michel_de, true_michel_charge, true_michel_light, true_delay,
+    true_stop_x, true_stop_y, true_stop_z
+    ]
+  reco_michel: [
+    ev_id, ev_unix, ev_pps_start, ev_pps_end,  
+    mip_score, proton_score, profile_mip_mcs_score_mean, profile_proton_mcs_score_mean,
+    tagged_energy, tagged_nhit, bkg_nhit, muon_theta, muon_phi, muon_eta,
+    cos_theta, muon_t, muon_q, muon_n, start_x, start_y, start_z, stop_x, stop_y, stop_z,
+    michel_stop_x, michel_stop_y, michel_stop_z,    
+    prompt_ampl, prompt_sum, prompt_sum_res, prompt_acc, delayed_time, delayed_sum, delayed_ampl, delayed_acc,
+    prompt_acc_ch, delayed_acc_ch, max_light_dt, imin_align_ns_nan, align_sample_idx_nan,
+    prompt_sum_ch, delayed_sum_ch, prompt_ampl_ch, delayed_ampl_ch, prompt_pca_terms,
+    through_going_muon_range, through_going,
+    true_michel, true_michel_plus, true_michel_minus, true_capt,
+    true_bkg_proton, true_bkg_nonstop_muon, true_bkg_stop_muon, true_bkg_neutron, true_bkg_pion, true_bkg_shower, true_bkg_other,
+    true_muon_de, true_muon_charge, true_muon_light,
+    true_michel_ke, true_michel_de, true_michel_charge, true_michel_light, true_delay,
+    true_stop_x, true_stop_y, true_stop_z,
+    ]    
+  reco_michel_light: [
+    ev_id, ev_unix, ev_pps_start, ev_pps_end,
+    reco_michel_light_true_michel,
+    mip_score, proton_score, profile_mip_mcs_score_mean, profile_proton_mcs_score_mean,
+    tagged_energy, tagged_nhit, bkg_nhit, muon_theta, muon_phi, muon_eta,
+    cos_theta, muon_t, muon_q, muon_n, start_x, start_y, start_z, stop_x, stop_y, stop_z,
+    michel_stop_x, michel_stop_y, michel_stop_z,    
+    prompt_ampl, prompt_sum, prompt_sum_res, prompt_acc, delayed_time, delayed_sum, delayed_ampl, delayed_acc,
+    prompt_sum_ch, delayed_sum_ch, prompt_ampl_ch, delayed_ampl_ch, prompt_pca_terms,
+    prompt_acc_ch, delayed_acc_ch, max_light_dt, imin_align_ns_nan, align_sample_idx_nan,
+    through_going_muon_range, through_going,
+    true_michel, true_michel_plus, true_michel_minus, true_capt, poor_reco,
+    true_bkg_proton, true_bkg_nonstop_muon, true_bkg_stop_muon, true_bkg_neutron, true_bkg_pion, true_bkg_shower, true_bkg_other,
+    true_muon_de, true_muon_charge, true_muon_light,
+    true_michel_ke, true_michel_de, true_michel_charge, true_michel_light, true_delay,
+    true_stop_x, true_stop_y, true_stop_z,
+    ]
+  mip_sideband: [
+    ev_id, ev_unix, ev_pps_start, ev_pps_end,  
+    mip_score, proton_score, profile_mip_mcs_score_mean, profile_proton_mcs_score_mean,
+    tagged_energy, tagged_nhit, bkg_nhit, muon_theta, muon_phi, muon_eta,
+    cos_theta, muon_t, muon_q, muon_n, start_x, start_y, start_z, stop_x, stop_y, stop_z,
+    michel_stop_x, michel_stop_y, michel_stop_z,    
+    prompt_ampl, prompt_sum, prompt_sum_res, prompt_acc, delayed_time, delayed_sum, delayed_ampl, delayed_acc,
+    prompt_sum_ch, delayed_sum_ch, prompt_ampl_ch, delayed_ampl_ch, prompt_pca_terms,
+    prompt_acc_ch, delayed_acc_ch, max_light_dt, imin_align_ns_nan, align_sample_idx_nan,
+    through_going_muon_range, through_going,
+    true_michel, true_michel_plus, true_michel_minus, true_capt,
+    true_bkg_proton, true_bkg_nonstop_muon, true_bkg_stop_muon, true_bkg_neutron, true_bkg_pion, true_bkg_shower, true_bkg_other,
+    true_muon_de, true_muon_charge, true_muon_light,
+    true_michel_ke, true_michel_de, true_michel_charge, true_michel_light, true_delay,
+    true_stop_x, true_stop_y, true_stop_z,
+    ]
+  mip_sideband_light: [
+    ev_id, ev_unix, ev_pps_start, ev_pps_end,  
+    mip_score, proton_score, profile_mip_mcs_score_mean, profile_proton_mcs_score_mean,
+    tagged_energy, tagged_nhit, bkg_nhit, muon_theta, muon_phi, muon_eta,
+    cos_theta, muon_t, muon_q, muon_n, start_x, start_y, start_z, stop_x, stop_y, stop_z,
+    michel_stop_x, michel_stop_y, michel_stop_z,    
+    prompt_ampl, prompt_sum, prompt_sum_res, prompt_acc, delayed_time, delayed_sum, delayed_ampl, delayed_acc,
+    prompt_sum_ch, delayed_sum_ch, prompt_ampl_ch, delayed_ampl_ch, prompt_pca_terms,
+    prompt_acc_ch, delayed_acc_ch, max_light_dt, imin_align_ns_nan, align_sample_idx_nan,
+    through_going_muon_range, through_going,
+    true_michel, true_michel_plus, true_michel_minus, true_capt,
+    true_bkg_proton, true_bkg_nonstop_muon, true_bkg_stop_muon, true_bkg_neutron, true_bkg_pion, true_bkg_shower, true_bkg_other,
+    true_muon_de, true_muon_charge, true_muon_light,
+    true_michel_ke, true_michel_de, true_michel_charge, true_michel_light, true_delay,
+    true_stop_x, true_stop_y, true_stop_z,
+    ]    
+
+
+event-list:
+  - reco_muon_veto
+  - reco_michel_light
+  - hand_scan7
+  - hand_scan9
 
 import:
   - numpy
   - numpy.ma
   - scipy
   - scipy.interpolate
+  - scipy.stats
 
 constants:
   light_samples:
@@ -56,6 +179,17 @@ constants:
     path: run_info
     name: is_mc
 
+  light_rescale: # overall scale factor for light signals (constrained by prompt sum for stopping muon)
+    expr: "0.815007 if is_mc and run == 2 else 1"
+
+  light_smear: # smearing parameters to improve data/sim agreement
+    expr: "numpy.load('light_smear-v0.0.npy') * (0 if not is_mc else 1)"
+  light_smear_bias: # smearing model bias (per detector)
+    expr: "(0 if not is_mc else (-0.1395 if run == 1 else 0.057242))"
+
+  print0:
+    expr: "print(input_filepath, run, thresholds, light_samples, is_mc, light_rescale, light_smear.shape, light_smear_bias)"
+
 
 datasets:
   prompt:
@@ -66,6 +200,8 @@ datasets:
     path: [analysis/time_reco/fit]
   michel_label:
     path: [analysis/michel_id/michel_label]
+  bkg_label:
+    path: [analysis/michel_id/bkg_label]    
   stop_label:
     path: [analysis/stopping_muons/event_sel_reco]
   profile:
@@ -87,6 +223,10 @@ datasets:
      path: [charge/events, light/events]
   #swvfm:
   #   path: [charge/events, light/events, light/swvfm]
+  #align:
+  #   path: [charge/events, light/events, light/swvfm/alignment]
+  #reco_tracks:
+  #   path: [charge/events, combined/tracklets/merged]
 
 
 histograms:
@@ -172,6 +312,20 @@ histograms:
     variable: tagged_nhit
     bins: {low: 0, high: 250, n: 125}
 
+  bkg_nhit:
+    variable: bkg_nhit
+    bins: {low: 0, high: 250, n: 125}
+
+  bkg_nhit_x_cos_theta:
+    variable: bkg_nhit_x_cos_theta
+    bins: {low: -250, high: 250, n: 250}
+
+  bkg_nhit_v_cos_theta:
+    variable: [bkg_nhit, cos_theta]
+    bins:
+        - {low: 0, high: 250, n: 125}
+        - {low: -1, high: 1, n: 500}
+
   #tagged_nhit_rescale:
   #  variable: tagged_nhit_rescale
   #  bins: {low: 0, high: 250, n: 125}
@@ -212,6 +366,10 @@ histograms:
     variable: delayed_sum
     bins: {low: 1, high: 500, n: 100}
 
+  delayed_sum_smear:
+    variable: delayed_sum_smear
+    bins: {low: 1, high: 500, n: 100}
+
   prompt_factor:
     variable: prompt_factor
     bins: {low: 1, high: 2000, n: 100}
@@ -228,6 +386,10 @@ histograms:
     variable: delayed_time
     bins: [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04]
 
+  delayed_time_rebin:
+    variable: delayed_time
+    bins: {low: 0, high: 10.0e+3, n: 250}
+
   #singlet_fraction:
   #  variable: fit
   #  field: fraction
@@ -241,6 +403,10 @@ histograms:
   true_delay:
     variable: true_delay
     bins: [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04]
+    
+  true_delay_rebin:
+    variable: true_delay
+    bins: {low: 0, high: 10.0e+3, n: 250}
     
   true_michel_de:
     variable: true_michel_de
@@ -325,6 +491,10 @@ histograms:
   cos_theta:
     variable: cos_theta
     bins: {low: -1, high: 1, n: 200}
+
+  cos_theta_zoom:
+    variable: cos_theta
+    bins: {low: -1, high: -0.9, n: 200}
     
   profile_cos_theta:
     variable: profile_cos
@@ -418,20 +588,43 @@ histograms:
   #  bins: [0.00e+00, 4.00e+01, 8.00e+01, 1.20e+02, 1.60e+02, 2.00e+02, 2.40e+02, 2.80e+02, 3.20e+02, 3.60e+02, 4.00e+02, 4.40e+02, 4.80e+02, 5.20e+02, 5.60e+02, 6.00e+02, 6.40e+02, 6.80e+02, 7.20e+02, 7.60e+02, 8.00e+02, 8.40e+02, 8.80e+02, 9.20e+02, 9.60e+02, 1.00e+03, 1.04e+03, 1.08e+03, 1.12e+03, 1.16e+03, 1.20e+03, 1.24e+03, 1.28e+03, 1.32e+03, 1.36e+03, 1.40e+03, 1.44e+03, 1.48e+03, 1.52e+03, 1.56e+03, 1.60e+03, 1.64e+03, 1.68e+03, 1.72e+03, 1.76e+03, 1.80e+03, 1.84e+03, 1.88e+03, 1.92e+03, 1.96e+03, 2.00e+03, 2.04e+03, 2.11e+03, 2.18e+03, 2.25e+03, 2.32e+03, 2.40e+03, 2.48e+03, 2.56e+03, 2.64e+03, 2.73e+03, 2.82e+03, 2.91e+03, 3.01e+03, 3.11e+03, 3.21e+03, 3.32e+03, 3.43e+03, 3.54e+03, 3.66e+03, 3.78e+03, 3.90e+03, 4.03e+03, 4.16e+03, 4.30e+03, 4.44e+03, 4.59e+03, 4.74e+03, 4.90e+03, 5.06e+03, 5.23e+03, 5.40e+03, 5.58e+03, 5.76e+03, 5.95e+03, 6.15e+03, 6.35e+03, 6.56e+03, 6.78e+03, 7.00e+03, 7.23e+03, 7.47e+03, 7.71e+03, 7.97e+03, 8.23e+03, 8.50e+03, 8.78e+03, 9.07e+03, 9.37e+03, 9.68e+03, 1.00e+04] # ns
 
 variables:
-  #align_ns_nan:
-  #  # shape: (cevents, levents, 1)
-  #  expr: "0" #"numpy.where(align['ns'].mask & ~np.all(align['ns'].mask, axis=-2)[:,np.newaxis,:], numpy.nan, align['ns'])"
-  #  filt: False
+  ev_id:
+    expr: "charge_events['id']"
+    filt: False
+  ev_unix:
+    expr: "charge_events['unix_ts']"
+    filt: False
+  ev_pps_start:
+    expr: "charge_events['ts_start']"
+    filt: False
+  ev_pps_end:
+    expr: "charge_events['ts_end']"
+    filt: False
+  all:
+    expr: "np.ones_like(ev_id, dtype=bool)"
 
-  #imin_align_ns_nan:
-  #  # shape: (cevents, )
-  #  expr: "0" # "numpy.nanargmin(align_ns_nan.reshape(align_ns_nan.shape[0], -1), axis=-1)"
-  #  filt: False
+  swvfm_align_idx:
+    expr: "(light_samples - align['sample_idx'][:,0,0]).filled(0).astype(int)[...,np.newaxis] + np.arange(256, dtype=int)"
+  swvfm_data_aligned:
+    # shape: (cevents, ntpc, ndet, light_samples*2)
+    expr: "np.zeros((align.shape[0], 2, 16, 2*light_samples))"
+  _do_swvfm_data_aligned:
+    expr: "np.put_along_axis(swvfm_data_aligned, swvfm_align_idx, swvfm['samples'][:,0,0].filled(0), axis=-1)"
 
-  #align_sample_idx_nan:
-  #  # shape: (cevents, levents, 1, ntpc, ndet) -> (cevents, ntpc, ndet)
-  #  expr: "0" # "numpy.take_along_axis(align['sample_idx'], imin_align_ns_nan[...,np.newaxis,np.newaxis,np.newaxis,np.newaxis], axis=1)"
-  #  filt: False
+  align_ns_nan:
+    # shape: (cevents, levents, 1)
+    expr: "numpy.where(align['ns'].mask & ~np.all(align['ns'].mask, axis=-2)[:,np.newaxis,:], numpy.nan, align['ns'])"
+    filt: False
+
+  imin_align_ns_nan:
+    # shape: (cevents, 1)
+    expr: "numpy.nanargmin(align_ns_nan.reshape(align_ns_nan.shape[0], -1), axis=-1)"
+    filt: False
+
+  align_sample_idx_nan:
+    # shape: (cevents, levents, 1, ntpc, ndet) -> (cevents, ntpc, ndet)
+    expr: "numpy.take_along_axis(align['sample_idx'], imin_align_ns_nan[...,np.newaxis,np.newaxis,np.newaxis,np.newaxis], axis=1).reshape((len(charge_events),) + align.dtype['sample_idx'].shape)"
+    filt: False
 
   #post_trigger_window:
   #  expr: "0" # "(light_samples - numpy.nanmax(np.where(((align_sample_idx_nan==0) | align_sample_idx_nan.mask) & ~np.all(align_sample_idx_nan.mask, axis=(-1,-2,-3,-4))[:,np.newaxis,np.newaxis,np.newaxis,np.newaxis], numpy.nan, align_sample_idx_nan), axis=(-1,-2,-3,-4)) - boundary_samples) * sample_rate * 1e3"
@@ -448,6 +641,7 @@ variables:
   # Variables that we also want to extract, but require a bit more manipulation
   max_light_dt:
     expr: "numpy.max(numpy.diff(numpy.max(light_events['tai_ns'].astype(float) * light_events['wvfm_valid'], axis=(-1)), axis=-2).filled(0), axis=(-1,-2)).clip(0, 15000) if light_events.shape[1] > 1 else numpy.zeros(charge_events.shape)"
+    filt: False
   prompt_factor:
     expr: "numpy.sqrt((prompt['terms']**2).sum(axis=1)).sum(axis=(-1,-2))"
     filt: False
@@ -455,23 +649,48 @@ variables:
     expr: "delayed['delay']" #"fit['delayed_ns']"
     filt: False
   prompt_sum:
-    expr: "prompt['sum']"
+    expr: "light_rescale * prompt['sum']"
+    filt: False
+  prompt_sum_res:
+    expr: "light_rescale * prompt['res_sum']"
+    filt: False
+  prompt_sum_ch:
+    expr: "light_rescale * fit['prompt_sum']"
+    filt: False
+  prompt_pca_terms:
+    expr: "prompt['terms']"
+    filt: False
+  delayed_sum_smear:
+    # adds a smearing factor to simulation
+    expr: "numpy.random.normal(size=prompt_sum_ch.shape, scale=numpy.sqrt((
+numpy.abs(light_smear[1:,:,:,1] + light_smear[1:,:,:,0]**2 * numpy.abs(prompt_sum_ch))
+-numpy.abs(light_smear[0:1,:,:,1] + light_smear[0:1,:,:,0]**2 * numpy.abs(prompt_sum_ch))
+).clip(1e-9, None)))"
+    filt: False
+  delayed_sum_ch:
+    expr: "light_rescale * fit['delayed_sum'] + delayed_sum_smear + light_smear_bias"
     filt: False
   delayed_sum:
-    expr: "delayed['sum']"
+    expr: "delayed_sum_ch.sum(axis=(-1,-2))"
     filt: False
   prompt_energy:
-    expr: "0.1 * fit['prompt_f'] * fit['pe_vis'] / fit['prompt_acc'].sum(axis=(-1,-2)).clip(1e-300,None)"
+    expr: "0.1 * fit['prompt_f'] * fit['pe_vis'] / fit['prompt_acc'].sum(axis=(-1,-2)).clip(1e-30,None)"
     filt: False    
   delayed_energy:
-    expr: "0.1 * (1-fit['prompt_f']) * fit['pe_vis'] / fit['delayed_acc'].sum(axis=(-1,-2)).clip(1e-300,None)"
+    expr: "0.1 * (1-fit['prompt_f']) * fit['pe_vis'] / fit['delayed_acc'].sum(axis=(-1,-2)).clip(1e-30,None)"
     filt: False
   tagged_nhit:
     expr: "michel_label['michel_nhit']"
     filt: False
+  tagged_energy:
+    expr: "michel_label['michel_e']"
+    filt: False
+  bkg_nhit:
+    expr: "bkg_label['bkg_nhit']"
+    filt: False
   #tagged_nhit_rescale:
-  #  expr: "michel_label['michel_nhit'] * (1 if is_mc == False else 1.11) + (0 if is_mc == False else numpy.random.norm(size=michel_label.shape, )"
-  #  filt: False    
+  #  expr: "michel_label['michel_nhit'] * (1 if is_mc == False else 1.11) + (0 if is_mc == False else numpy.random.norm(size=michel_label.shape))"
+  #  filt: False
   michel_e_smear:
     expr: "michel_label['michel_e'] + 3000 / 0.4796 * 23.6/1e3 * numpy.random.normal(scale=numpy.sqrt(michel_label['michel_nhit'].clip(1,None)), size=michel_label['michel_e'].shape)"
     filt: False    
@@ -479,10 +698,10 @@ variables:
     expr: "delayed['sig']"
     filt: False
   delayed_ampl:
-    expr: "delayed['ampl']"
+    expr: "light_rescale * delayed['ampl']"
     filt: False
   prompt_ampl:
-    expr: "prompt['ampl']"
+    expr: "light_rescale * prompt['ampl']"
     filt: False    
   prompt_sig:
     expr: "prompt['sig']"
@@ -490,9 +709,29 @@ variables:
   cos_theta:
     expr: "numpy.sum(michel_label['muon_dir'] * michel_label['michel_dir'], axis=-1)"
     filt: False
+  bkg_nhit_x_cos_theta:
+    expr: "bkg_nhit * cos_theta"
+    filt: False    
   muon_theta:
     expr: "michel_label['muon_dir'][:,1]"
-    filt: False    
+    filt: False
+  muon_phi:
+    expr: "michel_label['muon_dir'][:,2]"
+    filt: False
+  muon_eta:
+    expr: "michel_label['muon_dir'][:,0]"
+    filt: False
+  muon_azi:
+    expr: "numpy.arctan2(muon_eta, muon_phi)"
+  start_x:
+    expr: "profile['seed_pt'][:,0]"
+    filt: False
+  start_y:
+    expr: "profile['seed_pt'][:,1]"
+    filt: False
+  start_z:
+    expr: "profile['seed_pt'][:,2]"
+    filt: False
   stop_x:
     expr: "michel_label['stop_pt'][:,0]"
     filt: False
@@ -502,8 +741,32 @@ variables:
   stop_z:
     expr: "michel_label['stop_pt'][:,2]"
     filt: False
+  michel_stop_x:
+    expr: "michel_label['michel_end'][:,0]"
+    filt: False
+  michel_stop_y:
+    expr: "michel_label['michel_end'][:,1]"
+    filt: False
+  michel_stop_z:
+    expr: "michel_label['michel_end'][:,2]"
+    filt: False
   traj_reshape:
     expr: "traj_all.reshape(michel_label.shape + (-1,))"
+    filt: False
+  true_muon_charge:
+    expr: "stopping_track['n_electrons'].sum(axis=-1).filled(0).ravel()"
+    filt: False
+  true_muon_light:
+    expr: "stopping_track['n_photons'].sum(axis=-1).filled(0).ravel()"
+    filt: False
+  true_michel_charge:
+    expr: "michel_track['n_electrons'].sum(axis=-1).filled(0).ravel()"
+    filt: False
+  true_michel_light:
+    expr: "michel_track['n_photons'].sum(axis=-1).filled(0).ravel()"
+    filt: False
+  true_michel_ke:
+    expr: "numpy.sqrt(numpy.linalg.norm(capture_truth['michel_start_pxyz'], axis=-1) + 510.99895**2) - 510.99895"
     filt: False
   delta_near_endpoint:
     expr: "np.any(
@@ -526,7 +789,7 @@ variables:
     expr: "numpy.diff(profile['profile_pos'], axis=-2)"
     filt: False
   profile_dir:
-    expr: "profile_delta / numpy.linalg.norm(profile_delta, axis=-1, keepdims=True).clip(1e-303, None)"
+    expr: "profile_delta / numpy.linalg.norm(profile_delta, axis=-1, keepdims=True).clip(1e-30, None)"
     filt: False
   profile_cos:
     expr: "np.sum(profile_dir[...,1:,:] * profile_dir[...,:-1,:], axis=-1) * ~np.all(profile_dir[...,1:,:] != 0, axis=-1) * ~np.all(profile_dir[...,:-1,:] != 0, axis=-1) + (np.all(profile_dir[...,1:,:] == 0, axis=-1) | np.all(profile_dir[...,:-1,:] == 0, axis=-1)) * 50"
@@ -540,9 +803,6 @@ variables:
           np.take_along_axis(profile['profile_rr'], np.argmax(profile_scatter_flag, axis=-1)[...,np.newaxis] + 1, axis=-1).ravel(),
           profile['profile_rr'] * (profile['n'] > 0)).min(axis=-1)"
     filt: False
-  print0:
-    expr: "print(profile_delta.shape, profile_dir.shape, profile_cos.shape, profile_scatter_flag.shape, range_of_first_scatter.shape)"
-    filt: False
   dqdx:
     expr: "profile['profile_dqdx'] * (profile['profile_n'] > 0)"
     filt: False
@@ -550,7 +810,7 @@ variables:
     expr: "numpy.where((profile['profile_n'] > 0), profile['profile_dqdx'] * numpy.random.normal(size=profile['profile_dqdx'].shape, loc=1, scale=0.23 / np.sqrt(profile['profile_n'].clip(1,None))), 0)"
     filt: False    
   dndx:
-    expr: "profile['profile_n'] / numpy.clip(profile['profile_dx'], 1e-300, None)"
+    expr: "profile['profile_n'] / numpy.clip(profile['profile_dx'], 1e-30, None)"
     filt: False
   dn:
     expr: "profile['profile_n'] * (profile['profile_n'] > 0) + -50 * (profile['profile_n'] == 0)"
@@ -570,23 +830,59 @@ variables:
   muon_t:
     expr: "muon_range_table(profile['profile_rr'].max(axis=-1))"
     filt: False
+  through_going_muon_itrack:
+    expr: "numpy.argmin(np.linalg.norm(reco_tracks['trajectory'][:,:,0,:] - profile['seed_pt'][:,np.newaxis,:], axis=-1), axis=-1).ravel()"
+    filt: False
+  through_going_muon_track:
+    expr: "numpy.take_along_axis(reco_tracks, through_going_muon_itrack[:,numpy.newaxis], axis=-1).ravel()"
+    filt: False
+  through_going_muon_range:
+    expr: "numpy.sum(numpy.linalg.norm(through_going_muon_track['dx'], axis=-1), axis=-1).ravel()"
+    filt: False
   dedx:
     expr: "muon_dedx_table(profile['profile_rr'].ravel()).reshape(profile['profile_rr'].shape) * (profile['profile_n'] > 0)"
     filt: False    
   muon_q:
     expr: "(profile['profile_dqdx'] * profile['profile_dx'] * (profile['profile_n'] > 0) * (profile['profile_rr'] >= 0)).sum(axis=-1)"
     filt: False
+  muon_n:
+    expr: "(profile['profile_n'] * (profile['profile_n'] > 0) * (profile['profile_rr'] >= 0)).sum(axis=-1)"
+    filt: False    
   prompt_acc:
     expr: "fit['prompt_acc'].sum(axis=(-1,-2))"
     filt: False
   delayed_acc:
     expr: "fit['delayed_acc'].sum(axis=(-1,-2))"
     filt: False
+  prompt_acc_ch:
+    expr: "fit['prompt_acc']"
+    filt: False
+  delayed_acc_ch:
+    expr: "fit['delayed_acc']"
+    filt: False
+  prompt_ampl_ch:
+    expr: "fit['prompt_ampl']"
+    filt: False
+  delayed_ampl_ch:
+    expr: "fit['delayed_ampl']"
+    filt: False
   true_delay:
-    expr: "(michel_track['t0'][:,0] - stopping_track['t0'][:,0]) * 1e3" # convert us -> ns
+    expr: "(michel_track['t0'][:,0] - stopping_track['t0'][:,0]).filled(0).reshape(-1).clip(0,10) * 1e3" # convert us -> ns
+    filt: False
+  true_stop_x:
+    expr: "capture_truth['xyz_stop'][:,0]"
+    filt: False
+  true_stop_y:
+    expr: "capture_truth['xyz_stop'][:,1]"
+    filt: False
+  true_stop_z:
+    expr: "capture_truth['xyz_stop'][:,2]"
+    filt: False
+  true_muon_de:
+    expr: "stopping_track['dE'].sum(axis=-1).filled(0).ravel()"
     filt: False
   true_michel_de:
-    expr: "michel_track['dE'].sum(axis=-1)"
+    expr: "michel_track['dE'].sum(axis=-1).filled(0).ravel()"
     filt: False
   mip_score:
     expr: "(stop_label['mip_loglikelihood_mean'] - stop_label['muon_loglikelihood_mean']) * (stop_label['mip_loglikelihood_mean'] != 0.0) + 9999*(stop_label['mip_loglikelihood_mean'] == 0.0)"
@@ -641,62 +937,102 @@ variables:
 
 
   # ~~~ Cut variables ~~~
-  stop_pt_veto: # manual veto regions near anomalous number of selected stopping events
-    expr: "((run == 1) & (stop_z < 0) & ((
+  through_going:
+    expr: "numpy.all(numpy.abs(through_going_muon_track['trajectory'][:,[0,-1],1]) > 600, axis=-1).ravel().filled(False) & (numpy.prod(through_going_muon_track['trajectory'][:,[0,-1],1], axis=-1) < 0).ravel().filled(False)"
+  stop_pt_veto: # manually veto regions near high number of through-going backgrounds, due to poor reconstruction quality
+    expr: "(((run == 1) & (stop_z < 0) & ((
             (stop_x < -310.38+75.4) & (stop_x > -310.38)
           & (stop_y < -620.76+75.4) & (stop_y > -620.76))
          | ((stop_x < 62.1+26.60) & (stop_x > 62.1)
           & (stop_y < 97.55+26.60/2) & (stop_y > 97.55))
          | ((stop_x < 177.36+44.34) & (stop_x > 177.36)
-          & (stop_y < 124.15+26.60) & (stop_y > 124.15)) & (stop_z < 0))
+          & (stop_y < 124.15+26.60) & (stop_y > 124.15))
+         | ((stop_x < -310.38+75.40) & (stop_x > -310.38)
+          & (stop_y < 620.76) & (stop_y > 620.76-75.4))
+         | ((stop_x < 310.38) & (stop_x > 310.38-75.40)
+          & (stop_y < 620.76) & (stop_y > 620.76-75.4))
+         | ((stop_x < 26.60) & (stop_x > -26.60)
+          & (stop_y < -620.76+75.4) & (stop_y > -620.76))))
        | ((run == 1) & (stop_z > 0) & ((
-            (stop_x < 310.38) & (stop_x > 0) 
-          & (stop_y < -310.38+26.60) & (stop_y > -310.38))
+            (stop_x < 310.38) & (stop_x > 0)
+          & (stop_y < -310.38+26.60*1.5) & (stop_y > -310.38))
          | ((stop_x < -93.11+35.47) & (stop_x > -93.11)
           & (stop_y < -62.08+26.60) & (stop_y > -62.08))
          | ((stop_x < 53.2) & (stop_x > -26.60)
-          & (stop_y < -620.76+310.38+26.60) & (stop_y > -620.76))))
+          & (stop_y < -620.76+310.38+26.60) & (stop_y > -620.76))
+         | ((stop_x < 310.38) & (stop_x > 310.38-3*26.60)
+          & (stop_y < -310.38-2*26.60) & (stop_y > -310.38+4*26.60))
+         | ((stop_x < -310.38+75.40) & (stop_x > -310.38)
+          & (stop_y < 620.76) & (stop_y > 620.76-75.4))
+         | ((stop_x < 310.38) & (stop_x > 310.38-3*26.60)
+          & (stop_y < -310.38-2*26.60) & (stop_y > -310.38-4*26.60))
+         | ((stop_x < 310.38) & (stop_x > 310.38-75.40)
+          & (stop_y < 620.76) & (stop_y > 620.76-75.4))))
        | ((run == 2) & (stop_z < 0) & ((
-            (stop_x < 0) & (stop_x > -310.38)
-          & (stop_y < -310.38+2*26.60) & (stop_y > -310.38))
+            (stop_x < 14*4.434) & (stop_x > -310.38)
+          & (stop_y < -310.38+4.434*24) & (stop_y > -2*310.38))
          | ((stop_x < 177.36+44.34) & (stop_x > 177.36)
           & (stop_y < 124.15+26.60) & (stop_y > 124.15))))
        | ((run == 2) & (stop_z > 0) & ((
             (stop_x < 310.38) & (stop_x > 0)
-          & (stop_y < -310.38+26.60) & (stop_y > -310.38))
+          & (stop_y < -310.38+26.60*1.5) & (stop_y > -310.38))
          | ((stop_x < -93.11+35.47) & (stop_x > -93.11)
           & (stop_y < -62.08+26.60) & (stop_y > -62.08))
-         | ((stop_x < 0) & (stop_x > -310.38)
-          & (stop_y < 310.38+2*26.60) & (stop_y > 310.38))
-         | ((stop_x < 53.2) & (stop_x > 0)
-          & (stop_y < -620.76+310.38+26.60) & (stop_y > -620.76)))))
-      | ((stop_y < -620.76+155.19) & (numpy.abs(stop_z) < 310 - 155))"
+         | ((stop_x < 310.38) & (stop_x > 310.38-3*26.60)
+          & (stop_y < -310.38-2*26.60) & (stop_y > -310.38-4*26.60))
+         | ((stop_x < 14*4.434) & (stop_x > -310.38)
+          & (stop_y < 310.38+24*4.434) & (stop_y > -14*4.434))
+         | ((stop_x < 53.2) & (stop_x > -7*4.434)
+          & (stop_y < -620.76+310.38+26.60) & (stop_y > -620.76))))
+      | ((stop_y < -620.76+155.19) & (numpy.abs(stop_z) < 310 - 155)))"
     filt: False
-  fid_cut: # expand fiducial cut
+  quality_fid_cut: # cut events that don't start in detector
+    expr: "(numpy.abs(start_x) <= 310.38)
+          & (numpy.abs(start_y) <= 620.76)
+          & (numpy.abs(start_z) <= 315)"
+  fid_cut_60: # expand fiducial cut
     expr: "((numpy.abs(stop_z) > 31.04) & (numpy.abs(stop_z) < 310 - 62.08)
           & (numpy.abs(stop_x) < 310.38 - 62.08)
-          & (stop_y > -620.76 + 62.08) & (stop_y < 620.76 - 62.08*2))"
+          & (stop_y > -620.76 + 62.08) & (stop_y < 620.76 - 62.08))"
+    filt: False
+  fid_cut_40: # expand fiducial cut (to a lesser degree)
+    expr: "((numpy.abs(stop_z) > 39.91/2) & (numpy.abs(stop_z) < 310 - 39.91)
+          & (numpy.abs(stop_x) < 310.38 - 39.91)
+          & (stop_y > -620.76 + 39.91) & (stop_y < 620.76 - 39.91))"
     filt: False
   angle_veto:
     expr: "(muon_theta <= 0)"
     filt: False
   stop_cut:
-    expr: "stop_label['stop'] & ~((stop_x == 0.0) & (stop_y == 0.0) & (stop_z == 0.0)) & (max_light_dt < 15000)"
+    expr: "stop_label['stop'] & ~((stop_x == 0.0) & (stop_y == 0.0) & (stop_z == 0.0)) & (max_light_dt < 15000) & quality_fid_cut & ~angle_veto"
     filt: False
   muon_cut:
     expr: "stop_label['sel'] & (mip_score < 0.1) & (proton_score < -0.15) & (profile_mip_mcs_score_mean > -2.0) & (profile_proton_mcs_score_mean > -0.5)"
     filt: False
   veto:
-    expr: "angle_veto | stop_pt_veto | (tagged_nhit > 100)" # | (muon_range < 50)"
+    expr: "stop_pt_veto | (tagged_nhit > 100) | (bkg_nhit > 60) | ((bkg_nhit > 15) & (cos_theta < -0.992))"
     filt: False
   michel_cut:
     expr: "(tagged_nhit > 10) & (cos_theta > -0.98)"
     filt: False
+  michel_cut_nhit12:
+    expr: "(tagged_nhit > 12) & (cos_theta > -0.98)"
+    filt: False
+  michel_cut_nhit8:
+    expr: "(tagged_nhit > 12) & (cos_theta > -0.98)"
+    filt: False
+  
   light_cut:
-    expr: "(delayed_time > 340) & (prompt_ampl > 50) & (delayed_ampl > 20) & (delayed_sum > 50)"
-    #expr: "(delayed_time > 340) & (prompt_ampl > 100) & (delayed_ampl > 20)"
-    #expr: "(delayed_time > 340) & (prompt_factor > 150) & (delayed_ampl > 15)"
-    #expr: "(delayed_time > 340) & (prompt_factor > 200) & (delayed_sum > 50)"
+    expr: "(prompt['valid'] == 1) & (delayed['valid'] == 1) & (delayed_time > 340) & (delayed_sum > 50) & (delayed_sum / delayed_acc.clip(1e-30,None) > 15 * tagged_nhit)"
+  light_cut_yield20:
+    expr: "(prompt['valid'] == 1) & (delayed['valid'] == 1) & (delayed_time > 340) & (delayed_sum > 50) & (delayed_sum / delayed_acc.clip(1e-30,None) > 20 * tagged_nhit)"
+  light_cut_yield10:
+    expr: "(prompt['valid'] == 1) & (delayed['valid'] == 1) & (delayed_time > 340) & (delayed_sum > 50) & (delayed_sum / delayed_acc.clip(1e-30,None) > 10 * tagged_nhit)"
+  light_cut_sum50:
+    expr: "(prompt['valid'] == 1) & (delayed['valid'] == 1) & (delayed_time > 340) & (delayed_sum > 40) & (delayed_sum / delayed_acc.clip(1e-30,None) > 15 * tagged_nhit)"
+  light_cut_sum60:
+    expr: "(prompt['valid'] == 1) & (delayed['valid'] == 1) & (delayed_time > 340) & (delayed_sum > 60) & (delayed_sum / delayed_acc.clip(1e-30,None) > 15 * tagged_nhit)"
+
   in_charge_ratio_time_window:
     expr: "(delayed_time > 340) & (((run == 2) & (delayed_time < 9000)) | ((run == 1) & (delayed_time < 1460)))"
   in_michel_plus_time_window:
@@ -709,7 +1045,7 @@ variables:
 
   # ~~~ Truth variables ~~~
   poor_reco:
-    expr: "(numpy.abs(delayed_time - true_delay) > 100) | (delayed_time == 0)"
+    expr: "(numpy.abs(delayed_time - true_delay) > 100).astype(bool) | (delayed_time == 0).astype(bool)"
     filt: False
 
   # signal events
@@ -728,6 +1064,8 @@ variables:
     expr: "(~true_michel & ~true_capt & (stop_truth['proton_loglikelihood_mean'].astype(bool) | capture_truth['stopping_pdg_id'] == 2212) & ~true_bkg_stop_proton)"
   true_bkg_proton:
     expr: "(true_bkg_stop_proton | true_bkg_nonstop_proton)"
+  mc_proton_cut: # remove all proton events from simulation due to 100x over representation in simulation
+    expr: "true_bkg_proton if is_mc else np.zeros_like(ev_id, dtype=bool)"
     
   # true muon backgrounds
   true_bkg_stop_muon:
@@ -756,7 +1094,7 @@ variables:
 
   # ~~~ Selection filters ~~~
   reco_stop:
-    expr: "stop_cut"
+    expr: "stop_cut & ~mc_proton_cut"
   reco_stop_true_michel:
     expr: "reco_stop & true_michel"
   reco_stop_true_michel_plus:
@@ -784,7 +1122,9 @@ variables:
   reco_stop_bkg_shower:
     expr: "reco_stop & true_bkg_shower"
   reco_stop_bkg_other:
-    expr: "reco_stop & true_bkg_other"    
+    expr: "reco_stop & true_bkg_other"
+  reco_stop_bkg:
+    expr: "reco_stop & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"
 
   reco_muon:
     expr: "reco_stop & muon_cut"
@@ -815,7 +1155,9 @@ variables:
   reco_muon_bkg_shower:
     expr: "reco_muon & true_bkg_shower"
   reco_muon_bkg_other:
-    expr: "reco_muon & true_bkg_other"    
+    expr: "reco_muon & true_bkg_other"
+  reco_muon_bkg:
+    expr: "reco_muon & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"    
   
   proton_sideband:
     expr: "stop_cut & (proton_score > 0) & (mip_score < -0.25)"
@@ -849,7 +1191,7 @@ variables:
     expr: "proton_sideband & true_bkg_other"
     
   mip_sideband:
-    expr: "stop_cut & (proton_score < 0) & (mip_score > 0)"
+    expr: "stop_cut & (proton_score < 0) & (mip_score > 0) & ~mc_proton_cut"
   mip_sideband_true_michel:
     expr: "mip_sideband & true_michel"
   mip_sideband_true_michel_plus:
@@ -877,14 +1219,28 @@ variables:
   mip_sideband_bkg_shower:
     expr: "mip_sideband & true_bkg_shower"
   mip_sideband_bkg_other:
-    expr: "mip_sideband & true_bkg_other"    
+    expr: "mip_sideband & true_bkg_other"
 
   reco_muon_veto:
     expr: "reco_muon & ~veto"
   reco_muon_veto_top_half:
     expr: "reco_muon_veto & top_half"
   reco_muon_veto_bottom_half:
-    expr: "reco_muon_veto & bottom_half"    
+    expr: "reco_muon_veto & bottom_half"
+  reco_muon_veto_50_100MeV:
+    expr: "reco_muon_veto & (muon_t < 100e3) & (muon_t > 50e3)"
+  reco_muon_veto_100_200MeV:
+    expr: "reco_muon_veto & (muon_t > 100e3) & (muon_t < 200e3)"
+  reco_muon_veto_200_300MeV:
+    expr: "reco_muon_veto & (muon_t > 200e3) & (muon_t < 300e3)"
+  reco_muon_veto_azi0:
+    expr: "reco_muon_veto & (muon_azi < -numpy.pi/2)"
+  reco_muon_veto_azi1:
+    expr: "reco_muon_veto & (muon_azi < 0) & (muon_azi > -numpy.pi/2)"
+  reco_muon_veto_azi2:
+    expr: "reco_muon_veto & (muon_azi < numpy.pi/2) & (muon_azi > 0)"
+  reco_muon_veto_azi3:
+    expr: "reco_muon_veto & (muon_azi > numpy.pi/2)"
   reco_muon_veto_true_michel:
     expr: "reco_muon_veto & true_michel"
   reco_muon_veto_true_michel_plus:
@@ -913,6 +1269,175 @@ variables:
     expr: "reco_muon_veto & true_bkg_shower"    
   reco_muon_veto_bkg_other:
     expr: "reco_muon_veto & true_bkg_other"
+  reco_muon_veto_bkg:
+    expr: "reco_muon_veto & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"
+
+  reco_muon_veto_50_100MeV_true_michel:
+    expr: "reco_muon_veto_50_100MeV & true_michel"
+  reco_muon_veto_50_100MeV_true_michel_plus:
+    expr: "reco_muon_veto_50_100MeV & true_michel_plus"
+  reco_muon_veto_50_100MeV_true_michel_minus:
+    expr: "reco_muon_veto_50_100MeV & true_michel_minus"
+  reco_muon_veto_50_100MeV_true_capt:
+    expr: "reco_muon_veto_50_100MeV & true_capt"
+  reco_muon_veto_50_100MeV_bkg_proton:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_proton"
+  reco_muon_veto_50_100MeV_bkg_stop_proton:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_stop_proton"
+  reco_muon_veto_50_100MeV_bkg_nonstop_proton:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_nonstop_proton"
+  reco_muon_veto_50_100MeV_bkg_muon:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_muon"
+  reco_muon_veto_50_100MeV_bkg_stop_muon:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_stop_muon"
+  reco_muon_veto_50_100MeV_bkg_nonstop_muon:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_nonstop_muon"
+  reco_muon_veto_50_100MeV_bkg_neutron:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_neutron"
+  reco_muon_veto_50_100MeV_bkg_pion:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_pion"
+  reco_muon_veto_50_100MeV_bkg_shower:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_shower"    
+  reco_muon_veto_50_100MeV_bkg_other:
+    expr: "reco_muon_veto_50_100MeV & true_bkg_other"
+  reco_muon_veto_50_100MeV_bkg:
+    expr: "reco_muon_veto_50_100MeV & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"
+
+  reco_muon_veto_100_200MeV_true_michel:
+    expr: "reco_muon_veto_100_200MeV & true_michel"
+  reco_muon_veto_100_200MeV_true_michel_plus:
+    expr: "reco_muon_veto_100_200MeV & true_michel_plus"
+  reco_muon_veto_100_200MeV_true_michel_minus:
+    expr: "reco_muon_veto_100_200MeV & true_michel_minus"
+  reco_muon_veto_100_200MeV_true_capt:
+    expr: "reco_muon_veto_100_200MeV & true_capt"
+  reco_muon_veto_100_200MeV_bkg_proton:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_proton"
+  reco_muon_veto_100_200MeV_bkg_stop_proton:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_stop_proton"
+  reco_muon_veto_100_200MeV_bkg_nonstop_proton:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_nonstop_proton"
+  reco_muon_veto_100_200MeV_bkg_muon:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_muon"
+  reco_muon_veto_100_200MeV_bkg_stop_muon:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_stop_muon"
+  reco_muon_veto_100_200MeV_bkg_nonstop_muon:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_nonstop_muon"
+  reco_muon_veto_100_200MeV_bkg_neutron:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_neutron"
+  reco_muon_veto_100_200MeV_bkg_pion:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_pion"
+  reco_muon_veto_100_200MeV_bkg_shower:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_shower"    
+  reco_muon_veto_100_200MeV_bkg_other:
+    expr: "reco_muon_veto_100_200MeV & true_bkg_other"
+  reco_muon_veto_100_200MeV_bkg:
+    expr: "reco_muon_veto_100_200MeV & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"
+
+  reco_muon_veto_200_300MeV_true_michel:
+    expr: "reco_muon_veto_200_300MeV & true_michel"
+  reco_muon_veto_200_300MeV_true_michel_plus:
+    expr: "reco_muon_veto_200_300MeV & true_michel_plus"
+  reco_muon_veto_200_300MeV_true_michel_minus:
+    expr: "reco_muon_veto_200_300MeV & true_michel_minus"
+  reco_muon_veto_200_300MeV_true_capt:
+    expr: "reco_muon_veto_200_300MeV & true_capt"
+  reco_muon_veto_200_300MeV_bkg_proton:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_proton"
+  reco_muon_veto_200_300MeV_bkg_stop_proton:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_stop_proton"
+  reco_muon_veto_200_300MeV_bkg_nonstop_proton:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_nonstop_proton"
+  reco_muon_veto_200_300MeV_bkg_muon:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_muon"
+  reco_muon_veto_200_300MeV_bkg_stop_muon:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_stop_muon"
+  reco_muon_veto_200_300MeV_bkg_nonstop_muon:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_nonstop_muon"
+  reco_muon_veto_200_300MeV_bkg_neutron:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_neutron"
+  reco_muon_veto_200_300MeV_bkg_pion:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_pion"
+  reco_muon_veto_200_300MeV_bkg_shower:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_shower"    
+  reco_muon_veto_200_300MeV_bkg_other:
+    expr: "reco_muon_veto_200_300MeV & true_bkg_other"
+  reco_muon_veto_200_300MeV_bkg:
+    expr: "reco_muon_veto_200_300MeV & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"    
+
+  reco_muon_veto_fid60:
+    expr: "reco_muon & ~veto & fid_cut_60"
+  reco_muon_veto_fid60_top_half:
+    expr: "reco_muon_veto_fid60 & top_half"
+  reco_muon_veto_fid60_bottom_half:
+    expr: "reco_muon_veto_fid60 & bottom_half"    
+  reco_muon_veto_fid60_true_michel:
+    expr: "reco_muon_veto_fid60 & true_michel"
+  reco_muon_veto_fid60_true_michel_plus:
+    expr: "reco_muon_veto_fid60 & true_michel_plus"
+  reco_muon_veto_fid60_true_michel_minus:
+    expr: "reco_muon_veto_fid60 & true_michel_minus"
+  reco_muon_veto_fid60_true_capt:
+    expr: "reco_muon_veto_fid60 & true_capt"
+  reco_muon_veto_fid60_bkg_proton:
+    expr: "reco_muon_veto_fid60 & true_bkg_proton"
+  reco_muon_veto_fid60_bkg_stop_proton:
+    expr: "reco_muon_veto_fid60 & true_bkg_stop_proton"
+  reco_muon_veto_fid60_bkg_nonstop_proton:
+    expr: "reco_muon_veto_fid60 & true_bkg_nonstop_proton"
+  reco_muon_veto_fid60_bkg_muon:
+    expr: "reco_muon_veto_fid60 & true_bkg_muon"
+  reco_muon_veto_fid60_bkg_stop_muon:
+    expr: "reco_muon_veto_fid60 & true_bkg_stop_muon"
+  reco_muon_veto_fid60_bkg_nonstop_muon:
+    expr: "reco_muon_veto_fid60 & true_bkg_nonstop_muon"
+  reco_muon_veto_fid60_bkg_neutron:
+    expr: "reco_muon_veto_fid60 & true_bkg_neutron"
+  reco_muon_veto_fid60_bkg_pion:
+    expr: "reco_muon_veto_fid60 & true_bkg_pion"
+  reco_muon_veto_fid60_bkg_shower:
+    expr: "reco_muon_veto_fid60 & true_bkg_shower"    
+  reco_muon_veto_fid60_bkg_other:
+    expr: "reco_muon_veto_fid60 & true_bkg_other"
+  reco_muon_veto_fid60_bkg:
+    expr: "reco_muon_veto_fid60 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"
+
+  reco_muon_veto_fid40:
+    expr: "reco_muon & ~veto & fid_cut_40"
+  reco_muon_veto_fid40_top_half:
+    expr: "reco_muon_veto_fid40 & top_half"
+  reco_muon_veto_fid40_bottom_half:
+    expr: "reco_muon_veto_fid40 & bottom_half"    
+  reco_muon_veto_fid40_true_michel:
+    expr: "reco_muon_veto_fid40 & true_michel"
+  reco_muon_veto_fid40_true_michel_plus:
+    expr: "reco_muon_veto_fid40 & true_michel_plus"
+  reco_muon_veto_fid40_true_michel_minus:
+    expr: "reco_muon_veto_fid40 & true_michel_minus"
+  reco_muon_veto_fid40_true_capt:
+    expr: "reco_muon_veto_fid40 & true_capt"
+  reco_muon_veto_fid40_bkg_proton:
+    expr: "reco_muon_veto_fid40 & true_bkg_proton"
+  reco_muon_veto_fid40_bkg_stop_proton:
+    expr: "reco_muon_veto_fid40 & true_bkg_stop_proton"
+  reco_muon_veto_fid40_bkg_nonstop_proton:
+    expr: "reco_muon_veto_fid40 & true_bkg_nonstop_proton"
+  reco_muon_veto_fid40_bkg_muon:
+    expr: "reco_muon_veto_fid40 & true_bkg_muon"
+  reco_muon_veto_fid40_bkg_stop_muon:
+    expr: "reco_muon_veto_fid40 & true_bkg_stop_muon"
+  reco_muon_veto_fid40_bkg_nonstop_muon:
+    expr: "reco_muon_veto_fid40 & true_bkg_nonstop_muon"
+  reco_muon_veto_fid40_bkg_neutron:
+    expr: "reco_muon_veto_fid40 & true_bkg_neutron"
+  reco_muon_veto_fid40_bkg_pion:
+    expr: "reco_muon_veto_fid40 & true_bkg_pion"
+  reco_muon_veto_fid40_bkg_shower:
+    expr: "reco_muon_veto_fid40 & true_bkg_shower"    
+  reco_muon_veto_fid40_bkg_other:
+    expr: "reco_muon_veto_fid40 & true_bkg_other"
+  reco_muon_veto_fid40_bkg:
+    expr: "reco_muon_veto_fid40 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"        
 
   reco_muon_veto_true_michel_with_delta:
     expr: "reco_muon_veto & true_michel & delta_near_endpoint"
@@ -978,6 +1503,76 @@ variables:
   reco_muon_veto_no_protons_bkg_other:
     expr: "reco_muon_veto_no_protons & true_bkg_other"
 
+  reco_muon_veto_fid60_no_protons:
+    expr: "reco_muon_veto_fid60 & ~reco_muon_veto_bkg_proton"
+  reco_muon_veto_fid60_no_protons_top_half:
+    expr: "reco_muon_veto_fid60_no_protons & top_half"
+  reco_muon_veto_fid60_no_protons_bottom_half:
+    expr: "reco_muon_veto_fid60_no_protons & bottom_half"    
+  reco_muon_veto_fid60_no_protons_true_michel:
+    expr: "reco_muon_veto_fid60_no_protons & true_michel"
+  reco_muon_veto_fid60_no_protons_true_michel_plus:
+    expr: "reco_muon_veto_fid60_no_protons & true_michel_plus"
+  reco_muon_veto_fid60_no_protons_true_michel_minus:
+    expr: "reco_muon_veto_fid60_no_protons & true_michel_minus"
+  reco_muon_veto_fid60_no_protons_true_capt:
+    expr: "reco_muon_veto_fid60_no_protons & true_capt"
+  reco_muon_veto_fid60_no_protons_bkg_proton:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_proton"
+  reco_muon_veto_fid60_no_protons_bkg_stop_proton:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_stop_proton"
+  reco_muon_veto_fid60_no_protons_bkg_nonstop_proton:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_nonstop_proton"
+  reco_muon_veto_fid60_no_protons_bkg_muon:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_muon"
+  reco_muon_veto_fid60_no_protons_bkg_stop_muon:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_stop_muon"
+  reco_muon_veto_fid60_no_protons_bkg_nonstop_muon:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_nonstop_muon"
+  reco_muon_veto_fid60_no_protons_bkg_neutron:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_neutron"
+  reco_muon_veto_fid60_no_protons_bkg_pion:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_pion"
+  reco_muon_veto_fid60_no_protons_bkg_shower:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_shower"    
+  reco_muon_veto_fid60_no_protons_bkg_other:
+    expr: "reco_muon_veto_fid60_no_protons & true_bkg_other"
+
+  reco_muon_veto_fid40_no_protons:
+    expr: "reco_muon_veto_fid40 & ~reco_muon_veto_bkg_proton"
+  reco_muon_veto_fid40_no_protons_top_half:
+    expr: "reco_muon_veto_fid40_no_protons & top_half"
+  reco_muon_veto_fid40_no_protons_bottom_half:
+    expr: "reco_muon_veto_fid40_no_protons & bottom_half"    
+  reco_muon_veto_fid40_no_protons_true_michel:
+    expr: "reco_muon_veto_fid40_no_protons & true_michel"
+  reco_muon_veto_fid40_no_protons_true_michel_plus:
+    expr: "reco_muon_veto_fid40_no_protons & true_michel_plus"
+  reco_muon_veto_fid40_no_protons_true_michel_minus:
+    expr: "reco_muon_veto_fid40_no_protons & true_michel_minus"
+  reco_muon_veto_fid40_no_protons_true_capt:
+    expr: "reco_muon_veto_fid40_no_protons & true_capt"
+  reco_muon_veto_fid40_no_protons_bkg_proton:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_proton"
+  reco_muon_veto_fid40_no_protons_bkg_stop_proton:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_stop_proton"
+  reco_muon_veto_fid40_no_protons_bkg_nonstop_proton:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_nonstop_proton"
+  reco_muon_veto_fid40_no_protons_bkg_muon:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_muon"
+  reco_muon_veto_fid40_no_protons_bkg_stop_muon:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_stop_muon"
+  reco_muon_veto_fid40_no_protons_bkg_nonstop_muon:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_nonstop_muon"
+  reco_muon_veto_fid40_no_protons_bkg_neutron:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_neutron"
+  reco_muon_veto_fid40_no_protons_bkg_pion:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_pion"
+  reco_muon_veto_fid40_no_protons_bkg_shower:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_shower"    
+  reco_muon_veto_fid40_no_protons_bkg_other:
+    expr: "reco_muon_veto_fid40_no_protons & true_bkg_other"
+
   reco_michel:
     expr: "reco_muon_veto & michel_cut"
   reco_michel_true_michel:
@@ -1008,13 +1603,95 @@ variables:
     expr: "reco_michel & true_bkg_shower"
   reco_michel_bkg_other:
     expr: "reco_michel & true_bkg_other"
+  reco_michel_bkg:
+    expr: "reco_michel & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"        
+
+  reco_michel_nhit12:
+    expr: "reco_muon_veto & michel_cut_nhit12"
+  reco_michel_nhit12_true_michel:
+    expr: "reco_michel_nhit12 & true_michel"
+  reco_michel_nhit12_true_michel_plus:
+    expr: "reco_michel_nhit12 & true_michel_plus"
+  reco_michel_nhit12_true_michel_minus:
+    expr: "reco_michel_nhit12 & true_michel_minus"
+  reco_michel_nhit12_true_capt:
+    expr: "reco_michel_nhit12 & true_capt"
+  reco_michel_nhit12_bkg_proton:
+    expr: "reco_michel_nhit12 & true_bkg_proton"
+  reco_michel_nhit12_bkg_stop_proton:
+    expr: "reco_michel_nhit12 & true_bkg_stop_proton"
+  reco_michel_nhit12_bkg_nonstop_proton:
+    expr: "reco_michel_nhit12 & true_bkg_nonstop_proton"
+  reco_michel_nhit12_bkg_muon:
+    expr: "reco_michel_nhit12 & true_bkg_muon"
+  reco_michel_nhit12_bkg_stop_muon:
+    expr: "reco_michel_nhit12 & true_bkg_stop_muon"
+  reco_michel_nhit12_bkg_nonstop_muon:
+    expr: "reco_michel_nhit12 & true_bkg_nonstop_muon"
+  reco_michel_nhit12_bkg_neutron:
+    expr: "reco_michel_nhit12 & true_bkg_neutron"
+  reco_michel_nhit12_bkg_pion:
+    expr: "reco_michel_nhit12 & true_bkg_pion"
+  reco_michel_nhit12_bkg_shower:
+    expr: "reco_michel_nhit12 & true_bkg_shower"
+  reco_michel_nhit12_bkg_other:
+    expr: "reco_michel_nhit12 & true_bkg_other"
+  reco_michel_nhit12_bkg:
+    expr: "reco_michel_nhit12 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"
+
+  reco_michel_nhit8:
+    expr: "reco_muon_veto & michel_cut_nhit8"
+  reco_michel_nhit8_true_michel:
+    expr: "reco_michel_nhit8 & true_michel"
+  reco_michel_nhit8_true_michel_plus:
+    expr: "reco_michel_nhit8 & true_michel_plus"
+  reco_michel_nhit8_true_michel_minus:
+    expr: "reco_michel_nhit8 & true_michel_minus"
+  reco_michel_nhit8_true_capt:
+    expr: "reco_michel_nhit8 & true_capt"
+  reco_michel_nhit8_bkg_proton:
+    expr: "reco_michel_nhit8 & true_bkg_proton"
+  reco_michel_nhit8_bkg_stop_proton:
+    expr: "reco_michel_nhit8 & true_bkg_stop_proton"
+  reco_michel_nhit8_bkg_nonstop_proton:
+    expr: "reco_michel_nhit8 & true_bkg_nonstop_proton"
+  reco_michel_nhit8_bkg_muon:
+    expr: "reco_michel_nhit8 & true_bkg_muon"
+  reco_michel_nhit8_bkg_stop_muon:
+    expr: "reco_michel_nhit8 & true_bkg_stop_muon"
+  reco_michel_nhit8_bkg_nonstop_muon:
+    expr: "reco_michel_nhit8 & true_bkg_nonstop_muon"
+  reco_michel_nhit8_bkg_neutron:
+    expr: "reco_michel_nhit8 & true_bkg_neutron"
+  reco_michel_nhit8_bkg_pion:
+    expr: "reco_michel_nhit8 & true_bkg_pion"
+  reco_michel_nhit8_bkg_shower:
+    expr: "reco_michel_nhit8 & true_bkg_shower"
+  reco_michel_nhit8_bkg_other:
+    expr: "reco_michel_nhit8 & true_bkg_other"
+  reco_michel_nhit8_bkg:
+    expr: "reco_michel_nhit8 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton)"
 
   reco_michel_light:
     expr: "reco_michel & light_cut & in_charge_ratio_time_window"
   reco_michel_light_top_half:
-    expr: "reco_michel & light_cut & in_charge_ratio_time_window & top_half"
+    expr: "reco_michel_light & top_half"
   reco_michel_light_bottom_half:
-    expr: "reco_michel & light_cut & in_charge_ratio_time_window & bottom_half"
+    expr: "reco_michel_light & bottom_half"
+  reco_michel_light_50_100MeV:
+    expr: "reco_michel_light & (muon_t < 100e3) & (muon_t > 50e3)"
+  reco_michel_light_100_200MeV:
+    expr: "reco_michel_light & (muon_t > 100e3) & (muon_t < 200e3)"
+  reco_michel_light_200_300MeV:
+    expr: "reco_michel_light & (muon_t > 200e3) & (muon_t < 300e3)"
+  reco_michel_light_azi0:
+    expr: "reco_michel_light & (muon_azi < -numpy.pi/2)"
+  reco_michel_light_azi1:
+    expr: "reco_michel_light & (muon_azi < 0) & (muon_azi > -numpy.pi/2)"
+  reco_michel_light_azi2:
+    expr: "reco_michel_light & (muon_azi < numpy.pi/2) & (muon_azi > 0)"
+  reco_michel_light_azi3:
+    expr: "reco_michel_light & (muon_azi > numpy.pi/2)"    
   reco_michel_light_true_michel:
     expr: "reco_michel_light & true_michel & ~poor_reco"
   reco_michel_light_true_michel_plus:
@@ -1044,7 +1721,438 @@ variables:
   reco_michel_light_bkg_shower:
     expr: "reco_michel_light & true_bkg_shower"
   reco_michel_light_bkg_other:
-    expr: "reco_michel_light & true_bkg_other"
+    expr: "reco_michel_light & (true_bkg_other | (~true_michel & poor_reco & reco_michel_light))"
+  reco_michel_light_bkg:
+    expr: "reco_michel_light & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_poor_reco)"
+
+  reco_michel_light_50_100MeV:
+    expr: "reco_michel_light & reco_muon_veto_50_100MeV & in_charge_ratio_time_window"
+  reco_michel_light_50_100MeV_top_half:
+    expr: "reco_michel_light_50_100MeV & in_charge_ratio_time_window & top_half"
+  reco_michel_light_50_100MeV_bottom_half:
+    expr: "reco_michel_light_50_100MeV & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_50_100MeV_true_michel:
+    expr: "reco_michel_light_50_100MeV & true_michel & ~poor_reco"
+  reco_michel_light_50_100MeV_true_michel_plus:
+    expr: "reco_michel_light_50_100MeV & true_michel_plus & ~poor_reco"
+  reco_michel_light_50_100MeV_true_michel_minus:
+    expr: "reco_michel_light_50_100MeV & true_michel_minus & ~poor_reco"
+  reco_michel_light_50_100MeV_poor_reco:
+    expr: "reco_michel_light_50_100MeV & true_michel & poor_reco"
+  reco_michel_light_50_100MeV_true_capt:
+    expr: "reco_michel_light_50_100MeV & true_capt"
+  reco_michel_light_50_100MeV_bkg_proton:
+    expr: "reco_michel_light_50_100MeV & true_bkg_proton"
+  reco_michel_light_50_100MeV_bkg_stop_proton:
+    expr: "reco_michel_lixght_50_100MeV & true_bkg_stop_proton"
+  reco_michel_light_50_100MeV_bkg_nonstop_proton:
+    expr: "reco_michel_light_50_100MeV & true_bkg_nonstop_proton"
+  reco_michel_light_50_100MeV_bkg_muon:
+    expr: "reco_michel_light_50_100MeV & true_bkg_muon"
+  reco_michel_light_50_100MeV_bkg_stop_muon:
+    expr: "reco_michel_light_50_100MeV & true_bkg_stop_muon"
+  reco_michel_light_50_100MeV_bkg_nonstop_muon:
+    expr: "reco_michel_light_50_100MeV & true_bkg_nonstop_muon"
+  reco_michel_light_50_100MeV_bkg_neutron:
+    expr: "reco_michel_light_50_100MeV & true_bkg_neutron"
+  reco_michel_light_50_100MeV_bkg_pion:
+    expr: "reco_michel_light_50_100MeV & true_bkg_pion"
+  reco_michel_light_50_100MeV_bkg_shower:
+    expr: "reco_michel_light_50_100MeV & true_bkg_shower"
+  reco_michel_light_50_100MeV_bkg_other:
+    expr: "reco_michel_light_50_100MeV & true_bkg_other"
+  reco_michel_light_50_100MeV_bkg:
+    expr: "reco_michel_light_50_100MeV & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_50_100MeV_poor_reco)"
+
+  reco_michel_light_100_200MeV:
+    expr: "reco_michel_light & reco_muon_veto_100_200MeV & in_charge_ratio_time_window"
+  reco_michel_light_100_200MeV_top_half:
+    expr: "reco_michel_light_100_200MeV & in_charge_ratio_time_window & top_half"
+  reco_michel_light_100_200MeV_bottom_half:
+    expr: "reco_michel_light_100_200MeV & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_100_200MeV_true_michel:
+    expr: "reco_michel_light_100_200MeV & true_michel & ~poor_reco"
+  reco_michel_light_100_200MeV_true_michel_plus:
+    expr: "reco_michel_light_100_200MeV & true_michel_plus & ~poor_reco"
+  reco_michel_light_100_200MeV_true_michel_minus:
+    expr: "reco_michel_light_100_200MeV & true_michel_minus & ~poor_reco"
+  reco_michel_light_100_200MeV_poor_reco:
+    expr: "reco_michel_light_100_200MeV & true_michel & poor_reco"
+  reco_michel_light_100_200MeV_true_capt:
+    expr: "reco_michel_light_100_200MeV & true_capt"
+  reco_michel_light_100_200MeV_bkg_proton:
+    expr: "reco_michel_light_100_200MeV & true_bkg_proton"
+  reco_michel_light_100_200MeV_bkg_stop_proton:
+    expr: "reco_michel_lixght_100_200MeV & true_bkg_stop_proton"
+  reco_michel_light_100_200MeV_bkg_nonstop_proton:
+    expr: "reco_michel_light_100_200MeV & true_bkg_nonstop_proton"
+  reco_michel_light_100_200MeV_bkg_muon:
+    expr: "reco_michel_light_100_200MeV & true_bkg_muon"
+  reco_michel_light_100_200MeV_bkg_stop_muon:
+    expr: "reco_michel_light_100_200MeV & true_bkg_stop_muon"
+  reco_michel_light_100_200MeV_bkg_nonstop_muon:
+    expr: "reco_michel_light_100_200MeV & true_bkg_nonstop_muon"
+  reco_michel_light_100_200MeV_bkg_neutron:
+    expr: "reco_michel_light_100_200MeV & true_bkg_neutron"
+  reco_michel_light_100_200MeV_bkg_pion:
+    expr: "reco_michel_light_100_200MeV & true_bkg_pion"
+  reco_michel_light_100_200MeV_bkg_shower:
+    expr: "reco_michel_light_100_200MeV & true_bkg_shower"
+  reco_michel_light_100_200MeV_bkg_other:
+    expr: "reco_michel_light_100_200MeV & true_bkg_other"
+  reco_michel_light_100_200MeV_bkg:
+    expr: "reco_michel_light_100_200MeV & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_100_200MeV_poor_reco)"
+
+  reco_michel_light_200_300MeV:
+    expr: "reco_michel_light & reco_muon_veto_200_300MeV & in_charge_ratio_time_window"
+  reco_michel_light_200_300MeV_top_half:
+    expr: "reco_michel_light_200_300MeV & in_charge_ratio_time_window & top_half"
+  reco_michel_light_200_300MeV_bottom_half:
+    expr: "reco_michel_light_200_300MeV & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_200_300MeV_true_michel:
+    expr: "reco_michel_light_200_300MeV & true_michel & ~poor_reco"
+  reco_michel_light_200_300MeV_true_michel_plus:
+    expr: "reco_michel_light_200_300MeV & true_michel_plus & ~poor_reco"
+  reco_michel_light_200_300MeV_true_michel_minus:
+    expr: "reco_michel_light_200_300MeV & true_michel_minus & ~poor_reco"
+  reco_michel_light_200_300MeV_poor_reco:
+    expr: "reco_michel_light_200_300MeV & true_michel & poor_reco"
+  reco_michel_light_200_300MeV_true_capt:
+    expr: "reco_michel_light_200_300MeV & true_capt"
+  reco_michel_light_200_300MeV_bkg_proton:
+    expr: "reco_michel_light_200_300MeV & true_bkg_proton"
+  reco_michel_light_200_300MeV_bkg_stop_proton:
+    expr: "reco_michel_lixght_200_300MeV & true_bkg_stop_proton"
+  reco_michel_light_200_300MeV_bkg_nonstop_proton:
+    expr: "reco_michel_light_200_300MeV & true_bkg_nonstop_proton"
+  reco_michel_light_200_300MeV_bkg_muon:
+    expr: "reco_michel_light_200_300MeV & true_bkg_muon"
+  reco_michel_light_200_300MeV_bkg_stop_muon:
+    expr: "reco_michel_light_200_300MeV & true_bkg_stop_muon"
+  reco_michel_light_200_300MeV_bkg_nonstop_muon:
+    expr: "reco_michel_light_200_300MeV & true_bkg_nonstop_muon"
+  reco_michel_light_200_300MeV_bkg_neutron:
+    expr: "reco_michel_light_200_300MeV & true_bkg_neutron"
+  reco_michel_light_200_300MeV_bkg_pion:
+    expr: "reco_michel_light_200_300MeV & true_bkg_pion"
+  reco_michel_light_200_300MeV_bkg_shower:
+    expr: "reco_michel_light_200_300MeV & true_bkg_shower"
+  reco_michel_light_200_300MeV_bkg_other:
+    expr: "reco_michel_light_200_300MeV & true_bkg_other"
+  reco_michel_light_200_300MeV_bkg:
+    expr: "reco_michel_light_200_300MeV & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_200_300MeV_poor_reco)"
+
+  reco_michel_light_sum50:
+    expr: "reco_michel & light_cut_sum50 & in_charge_ratio_time_window"
+  reco_michel_light_sum50_top_half:
+    expr: "reco_michel_light_sum50 & in_charge_ratio_time_window & top_half"
+  reco_michel_light_sum50_bottom_half:
+    expr: "reco_michel_light_sum50 & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_sum50_true_michel:
+    expr: "reco_michel_light_sum50 & true_michel & ~poor_reco"
+  reco_michel_light_sum50_true_michel_plus:
+    expr: "reco_michel_light_sum50 & true_michel_plus & ~poor_reco"
+  reco_michel_light_sum50_true_michel_minus:
+    expr: "reco_michel_light_sum50 & true_michel_minus & ~poor_reco"
+  reco_michel_light_sum50_poor_reco:
+    expr: "reco_michel_light_sum50 & true_michel & poor_reco"
+  reco_michel_light_sum50_true_capt:
+    expr: "reco_michel_light_sum50 & true_capt"
+  reco_michel_light_sum50_bkg_proton:
+    expr: "reco_michel_light_sum50 & true_bkg_proton"
+  reco_michel_light_sum50_bkg_stop_proton:
+    expr: "reco_michel_lixght_sum50 & true_bkg_stop_proton"
+  reco_michel_light_sum50_bkg_nonstop_proton:
+    expr: "reco_michel_light_sum50 & true_bkg_nonstop_proton"
+  reco_michel_light_sum50_bkg_muon:
+    expr: "reco_michel_light_sum50 & true_bkg_muon"
+  reco_michel_light_sum50_bkg_stop_muon:
+    expr: "reco_michel_light_sum50 & true_bkg_stop_muon"
+  reco_michel_light_sum50_bkg_nonstop_muon:
+    expr: "reco_michel_light_sum50 & true_bkg_nonstop_muon"
+  reco_michel_light_sum50_bkg_neutron:
+    expr: "reco_michel_light_sum50 & true_bkg_neutron"
+  reco_michel_light_sum50_bkg_pion:
+    expr: "reco_michel_light_sum50 & true_bkg_pion"
+  reco_michel_light_sum50_bkg_shower:
+    expr: "reco_michel_light_sum50 & true_bkg_shower"
+  reco_michel_light_sum50_bkg_other:
+    expr: "reco_michel_light_sum50 & true_bkg_other"
+  reco_michel_light_sum50_bkg:
+    expr: "reco_michel_light_sum50 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_sum50_poor_reco)"
+
+  reco_michel_light_sum60:
+    expr: "reco_michel & light_cut_sum60 & in_charge_ratio_time_window"
+  reco_michel_light_sum60_top_half:
+    expr: "reco_michel_light_sum60 & in_charge_ratio_time_window & top_half"
+  reco_michel_light_sum60_bottom_half:
+    expr: "reco_michel_light_sum60 & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_sum60_true_michel:
+    expr: "reco_michel_light_sum60 & true_michel & ~poor_reco"
+  reco_michel_light_sum60_true_michel_plus:
+    expr: "reco_michel_light_sum60 & true_michel_plus & ~poor_reco"
+  reco_michel_light_sum60_true_michel_minus:
+    expr: "reco_michel_light_sum60 & true_michel_minus & ~poor_reco"
+  reco_michel_light_sum60_poor_reco:
+    expr: "reco_michel_light_sum60 & true_michel & poor_reco"
+  reco_michel_light_sum60_true_capt:
+    expr: "reco_michel_light_sum60 & true_capt"
+  reco_michel_light_sum60_bkg_proton:
+    expr: "reco_michel_light_sum60 & true_bkg_proton"
+  reco_michel_light_sum60_bkg_stop_proton:
+    expr: "reco_michel_light_sum60 & true_bkg_stop_proton"
+  reco_michel_light_sum60_bkg_nonstop_proton:
+    expr: "reco_michel_light_sum60 & true_bkg_nonstop_proton"
+  reco_michel_light_sum60_bkg_muon:
+    expr: "reco_michel_light_sum60 & true_bkg_muon"
+  reco_michel_light_sum60_bkg_stop_muon:
+    expr: "reco_michel_light_sum60 & true_bkg_stop_muon"
+  reco_michel_light_sum60_bkg_nonstop_muon:
+    expr: "reco_michel_light_sum60 & true_bkg_nonstop_muon"
+  reco_michel_light_sum60_bkg_neutron:
+    expr: "reco_michel_light_sum60 & true_bkg_neutron"
+  reco_michel_light_sum60_bkg_pion:
+    expr: "reco_michel_light_sum60 & true_bkg_pion"
+  reco_michel_light_sum60_bkg_shower:
+    expr: "reco_michel_light_sum60 & true_bkg_shower"
+  reco_michel_light_sum60_bkg_other:
+    expr: "reco_michel_light_sum60 & true_bkg_other"
+  reco_michel_light_sum60_bkg:
+    expr: "reco_michel_light_sum60 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_sum60_poor_reco)"
+
+  reco_michel_light_yield20:
+    expr: "reco_michel & light_cut_yield20 & in_charge_ratio_time_window"
+  reco_michel_light_yield20_top_half:
+    expr: "reco_michel_light_yield20 & in_charge_ratio_time_window & top_half"
+  reco_michel_light_yield20_bottom_half:
+    expr: "reco_michel_light_yield20 & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_yield20_true_michel:
+    expr: "reco_michel_light_yield20 & true_michel & ~poor_reco"
+  reco_michel_light_yield20_true_michel_plus:
+    expr: "reco_michel_light_yield20 & true_michel_plus & ~poor_reco"
+  reco_michel_light_yield20_true_michel_minus:
+    expr: "reco_michel_light_yield20 & true_michel_minus & ~poor_reco"
+  reco_michel_light_yield20_poor_reco:
+    expr: "reco_michel_light_yield20 & true_michel & poor_reco"
+  reco_michel_light_yield20_true_capt:
+    expr: "reco_michel_light_yield20 & true_capt"
+  reco_michel_light_yield20_bkg_proton:
+    expr: "reco_michel_light_yield20 & true_bkg_proton"
+  reco_michel_light_yield20_bkg_stop_proton:
+    expr: "reco_michel_light_yield20 & true_bkg_stop_proton"
+  reco_michel_light_yield20_bkg_nonstop_proton:
+    expr: "reco_michel_light_yield20 & true_bkg_nonstop_proton"
+  reco_michel_light_yield20_bkg_muon:
+    expr: "reco_michel_light_yield20 & true_bkg_muon"
+  reco_michel_light_yield20_bkg_stop_muon:
+    expr: "reco_michel_light_yield20 & true_bkg_stop_muon"
+  reco_michel_light_yield20_bkg_nonstop_muon:
+    expr: "reco_michel_light_yield20 & true_bkg_nonstop_muon"
+  reco_michel_light_yield20_bkg_neutron:
+    expr: "reco_michel_light_yield20 & true_bkg_neutron"
+  reco_michel_light_yield20_bkg_pion:
+    expr: "reco_michel_light_yield20 & true_bkg_pion"
+  reco_michel_light_yield20_bkg_shower:
+    expr: "reco_michel_light_yield20 & true_bkg_shower"
+  reco_michel_light_yield20_bkg_other:
+    expr: "reco_michel_light_yield20 & true_bkg_other"
+  reco_michel_light_yield20_bkg:
+    expr: "reco_michel_light_yield20 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_yield20_poor_reco)"
+
+  reco_michel_light_yield10:
+    expr: "reco_michel & light_cut_yield10 & in_charge_ratio_time_window"
+  reco_michel_light_yield10_top_half:
+    expr: "reco_michel_light_yield10 & in_charge_ratio_time_window & top_half"
+  reco_michel_light_yield10_bottom_half:
+    expr: "reco_michel_light_yield10 & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_yield10_true_michel:
+    expr: "reco_michel_light_yield10 & true_michel & ~poor_reco"
+  reco_michel_light_yield10_true_michel_plus:
+    expr: "reco_michel_light_yield10 & true_michel_plus & ~poor_reco"
+  reco_michel_light_yield10_true_michel_minus:
+    expr: "reco_michel_light_yield10 & true_michel_minus & ~poor_reco"
+  reco_michel_light_yield10_poor_reco:
+    expr: "reco_michel_light_yield10 & true_michel & poor_reco"
+  reco_michel_light_yield10_true_capt:
+    expr: "reco_michel_light_yield10 & true_capt"
+  reco_michel_light_yield10_bkg_proton:
+    expr: "reco_michel_light_yield10 & true_bkg_proton"
+  reco_michel_light_yield10_bkg_stop_proton:
+    expr: "reco_michel_light_yield10 & true_bkg_stop_proton"
+  reco_michel_light_yield10_bkg_nonstop_proton:
+    expr: "reco_michel_light_yield10 & true_bkg_nonstop_proton"
+  reco_michel_light_yield10_bkg_muon:
+    expr: "reco_michel_light_yield10 & true_bkg_muon"
+  reco_michel_light_yield10_bkg_stop_muon:
+    expr: "reco_michel_light_yield10 & true_bkg_stop_muon"
+  reco_michel_light_yield10_bkg_nonstop_muon:
+    expr: "reco_michel_light_yield10 & true_bkg_nonstop_muon"
+  reco_michel_light_yield10_bkg_neutron:
+    expr: "reco_michel_light_yield10 & true_bkg_neutron"
+  reco_michel_light_yield10_bkg_pion:
+    expr: "reco_michel_light_yield10 & true_bkg_pion"
+  reco_michel_light_yield10_bkg_shower:
+    expr: "reco_michel_light_yield10 & true_bkg_shower"
+  reco_michel_light_yield10_bkg_other:
+    expr: "reco_michel_light_yield10 & true_bkg_other"
+  reco_michel_light_yield10_bkg:
+    expr: "reco_michel_light_yield10 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_yield10_poor_reco)"
+
+  reco_michel_light_nhit12:
+    expr: "reco_michel_nhit12 & light_cut & in_charge_ratio_time_window"
+  reco_michel_light_nhit12_top_half:
+    expr: "reco_michel_light_nhit12 & in_charge_ratio_time_window & top_half"
+  reco_michel_light_nhit12_bottom_half:
+    expr: "reco_michel_light_nhit12 & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_nhit12_true_michel:
+    expr: "reco_michel_light_nhit12 & true_michel & ~poor_reco"
+  reco_michel_light_nhit12_true_michel_plus:
+    expr: "reco_michel_light_nhit12 & true_michel_plus & ~poor_reco"
+  reco_michel_light_nhit12_true_michel_minus:
+    expr: "reco_michel_light_nhit12 & true_michel_minus & ~poor_reco"
+  reco_michel_light_nhit12_poor_reco:
+    expr: "reco_michel_light_nhit12 & true_michel & poor_reco"
+  reco_michel_light_nhit12_true_capt:
+    expr: "reco_michel_light_nhit12 & true_capt"
+  reco_michel_light_nhit12_bkg_proton:
+    expr: "reco_michel_light_nhit12 & true_bkg_proton"
+  reco_michel_light_nhit12_bkg_stop_proton:
+    expr: "reco_michel_light_nhit12 & true_bkg_stop_proton"
+  reco_michel_light_nhit12_bkg_nonstop_proton:
+    expr: "reco_michel_light_nhit12 & true_bkg_nonstop_proton"
+  reco_michel_light_nhit12_bkg_muon:
+    expr: "reco_michel_light_nhit12 & true_bkg_muon"
+  reco_michel_light_nhit12_bkg_stop_muon:
+    expr: "reco_michel_light_nhit12 & true_bkg_stop_muon"
+  reco_michel_light_nhit12_bkg_nonstop_muon:
+    expr: "reco_michel_light_nhit12 & true_bkg_nonstop_muon"
+  reco_michel_light_nhit12_bkg_neutron:
+    expr: "reco_michel_light_nhit12 & true_bkg_neutron"
+  reco_michel_light_nhit12_bkg_pion:
+    expr: "reco_michel_light_nhit12 & true_bkg_pion"
+  reco_michel_light_nhit12_bkg_shower:
+    expr: "reco_michel_light_nhit12 & true_bkg_shower"
+  reco_michel_light_nhit12_bkg_other:
+    expr: "reco_michel_light_nhit12 & true_bkg_other"
+  reco_michel_light_nhit12_bkg:
+    expr: "reco_michel_light_nhit12 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_nhit12_poor_reco)"
+
+  reco_michel_light_nhit8:
+    expr: "reco_michel_nhit8 & light_cut & in_charge_ratio_time_window"
+  reco_michel_light_nhit8_top_half:
+    expr: "reco_michel_light_nhit8 & in_charge_ratio_time_window & top_half"
+  reco_michel_light_nhit8_bottom_half:
+    expr: "reco_michel_light_nhit8 & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_nhit8_true_michel:
+    expr: "reco_michel_light_nhit8 & true_michel & ~poor_reco"
+  reco_michel_light_nhit8_true_michel_plus:
+    expr: "reco_michel_light_nhit8 & true_michel_plus & ~poor_reco"
+  reco_michel_light_nhit8_true_michel_minus:
+    expr: "reco_michel_light_nhit8 & true_michel_minus & ~poor_reco"
+  reco_michel_light_nhit8_poor_reco:
+    expr: "reco_michel_light_nhit8 & true_michel & poor_reco"
+  reco_michel_light_nhit8_true_capt:
+    expr: "reco_michel_light_nhit8 & true_capt"
+  reco_michel_light_nhit8_bkg_proton:
+    expr: "reco_michel_light_nhit8 & true_bkg_proton"
+  reco_michel_light_nhit8_bkg_stop_proton:
+    expr: "reco_michel_light_nhit8 & true_bkg_stop_proton"
+  reco_michel_light_nhit8_bkg_nonstop_proton:
+    expr: "reco_michel_light_nhit8 & true_bkg_nonstop_proton"
+  reco_michel_light_nhit8_bkg_muon:
+    expr: "reco_michel_light_nhit8 & true_bkg_muon"
+  reco_michel_light_nhit8_bkg_stop_muon:
+    expr: "reco_michel_light_nhit8 & true_bkg_stop_muon"
+  reco_michel_light_nhit8_bkg_nonstop_muon:
+    expr: "reco_michel_light_nhit8 & true_bkg_nonstop_muon"
+  reco_michel_light_nhit8_bkg_neutron:
+    expr: "reco_michel_light_nhit8 & true_bkg_neutron"
+  reco_michel_light_nhit8_bkg_pion:
+    expr: "reco_michel_light_nhit8 & true_bkg_pion"
+  reco_michel_light_nhit8_bkg_shower:
+    expr: "reco_michel_light_nhit8 & true_bkg_shower"
+  reco_michel_light_nhit8_bkg_other:
+    expr: "reco_michel_light_nhit8 & true_bkg_other"
+  reco_michel_light_nhit8_bkg:
+    expr: "reco_michel_light_nhit8 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_nhit8_poor_reco)"
+    
+  reco_michel_light_fid60:
+    expr: "reco_michel & light_cut & in_charge_ratio_time_window & fid_cut_60"
+  reco_michel_light_fid60_top_half:
+    expr: "reco_michel_light_fid60 & in_charge_ratio_time_window & top_half"
+  reco_michel_light_fid60_bottom_half:
+    expr: "reco_michel_light_fid60 & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_fid60_true_michel:
+    expr: "reco_michel_light_fid60 & true_michel & ~poor_reco"
+  reco_michel_light_fid60_true_michel_plus:
+    expr: "reco_michel_light_fid60 & true_michel_plus & ~poor_reco"
+  reco_michel_light_fid60_true_michel_minus:
+    expr: "reco_michel_light_fid60 & true_michel_minus & ~poor_reco"
+  reco_michel_light_fid60_poor_reco:
+    expr: "reco_michel_light_fid60 & true_michel & poor_reco"
+  reco_michel_light_fid60_true_capt:
+    expr: "reco_michel_light_fid60 & true_capt"
+  reco_michel_light_fid60_bkg_proton:
+    expr: "reco_michel_light_fid60 & true_bkg_proton"
+  reco_michel_light_fid60_bkg_stop_proton:
+    expr: "reco_michel_light_fid60 & true_bkg_stop_proton"
+  reco_michel_light_fid60_bkg_nonstop_proton:
+    expr: "reco_michel_light_fid60 & true_bkg_nonstop_proton"
+  reco_michel_light_fid60_bkg_muon:
+    expr: "reco_michel_light_fid60 & true_bkg_muon"
+  reco_michel_light_fid60_bkg_stop_muon:
+    expr: "reco_michel_light_fid60 & true_bkg_stop_muon"
+  reco_michel_light_fid60_bkg_nonstop_muon:
+    expr: "reco_michel_light_fid60 & true_bkg_nonstop_muon"
+  reco_michel_light_fid60_bkg_neutron:
+    expr: "reco_michel_light_fid60 & true_bkg_neutron"
+  reco_michel_light_fid60_bkg_pion:
+    expr: "reco_michel_light_fid60 & true_bkg_pion"
+  reco_michel_light_fid60_bkg_shower:
+    expr: "reco_michel_light_fid60 & true_bkg_shower"
+  reco_michel_light_fid60_bkg_other:
+    expr: "reco_michel_light_fid60 & true_bkg_other"
+  reco_michel_light_fid60_bkg:
+    expr: "reco_michel_light_fid60 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_fid60_poor_reco)"
+    
+  reco_michel_light_fid40:
+    expr: "reco_michel & light_cut & in_charge_ratio_time_window & fid_cut_40"
+  reco_michel_light_fid40_top_half:
+    expr: "reco_michel_light_fid40 & in_charge_ratio_time_window & top_half"
+  reco_michel_light_fid40_bottom_half:
+    expr: "reco_michel_light_fid40 & in_charge_ratio_time_window & bottom_half"
+  reco_michel_light_fid40_true_michel:
+    expr: "reco_michel_light_fid40 & true_michel & ~poor_reco"
+  reco_michel_light_fid40_true_michel_plus:
+    expr: "reco_michel_light_fid40 & true_michel_plus & ~poor_reco"
+  reco_michel_light_fid40_true_michel_minus:
+    expr: "reco_michel_light_fid40 & true_michel_minus & ~poor_reco"
+  reco_michel_light_fid40_poor_reco:
+    expr: "reco_michel_light_fid40 & true_michel & poor_reco"
+  reco_michel_light_fid40_true_capt:
+    expr: "reco_michel_light_fid40 & true_capt"
+  reco_michel_light_fid40_bkg_proton:
+    expr: "reco_michel_light_fid40 & true_bkg_proton"
+  reco_michel_light_fid40_bkg_stop_proton:
+    expr: "reco_michel_light_fid40 & true_bkg_stop_proton"
+  reco_michel_light_fid40_bkg_nonstop_proton:
+    expr: "reco_michel_light_fid40 & true_bkg_nonstop_proton"
+  reco_michel_light_fid40_bkg_muon:
+    expr: "reco_michel_light_fid40 & true_bkg_muon"
+  reco_michel_light_fid40_bkg_stop_muon:
+    expr: "reco_michel_light_fid40 & true_bkg_stop_muon"
+  reco_michel_light_fid40_bkg_nonstop_muon:
+    expr: "reco_michel_light_fid40 & true_bkg_nonstop_muon"
+  reco_michel_light_fid40_bkg_neutron:
+    expr: "reco_michel_light_fid40 & true_bkg_neutron"
+  reco_michel_light_fid40_bkg_pion:
+    expr: "reco_michel_light_fid40 & true_bkg_pion"
+  reco_michel_light_fid40_bkg_shower:
+    expr: "reco_michel_light_fid40 & true_bkg_shower"
+  reco_michel_light_fid40_bkg_other:
+    expr: "reco_michel_light_fid40 & true_bkg_other"
+  reco_michel_light_fid40_bkg:
+    expr: "reco_michel_light_fid40 & (true_bkg_other | true_bkg_shower | true_bkg_pion | true_bkg_neutron | true_bkg_muon | true_bkg_proton | reco_michel_light_fid40_poor_reco)"
 
   reco_michel_plus_light:
     expr: "reco_michel & light_cut & in_michel_plus_time_window"
@@ -1079,104 +2187,170 @@ variables:
   reco_michel_plus_light_bkg_other:
     expr: "reco_michel_plus_light & true_bkg_other"
 
-  reco_nomichel:
-    expr: "reco_michel & (michel_label['michel_e'] > 75000)"
-  reco_nomichel_true_michel:
-    expr: "reco_nomichel & true_michel & ~poor_reco"
-  reco_nomichel_true_michel_plus:
-    expr: "reco_nomichel & true_michel_plus & ~poor_reco"
-  reco_nomichel_true_michel_minus:
-    expr: "reco_nomichel & true_michel_minus & ~poor_reco"
-  reco_nomichel_poor_reco:
-    expr: "reco_nomichel & true_michel & poor_reco"
-  reco_nomichel_true_capt:
-    expr: "reco_nomichel & true_capt"
-  reco_nomichel_bkg_proton:
-    expr: "reco_nomichel & true_bkg_proton"
-  reco_nomichel_bkg_stop_proton:
-    expr: "reco_nomichel & true_bkg_stop_proton"
-  reco_nomichel_bkg_nonstop_proton:
-    expr: "reco_nomichel & true_bkg_nonstop_proton"
-  reco_nomichel_bkg_muon:
-    expr: "reco_nomichel & true_bkg_muon"
-  reco_nomichel_bkg_stop_muon:
-    expr: "reco_nomichel & true_bkg_stop_muon"
-  reco_nomichel_bkg_nonstop_muon:
-    expr: "reco_nomichel & true_bkg_nonstop_muon"
-  reco_nomichel_bkg_neutron:
-    expr: "reco_nomichel & true_bkg_neutron"
-  reco_nomichel_bkg_pion:
-    expr: "reco_nomichel & true_bkg_pion"
-  reco_nomichel_bkg_shower:
-    expr: "reco_nomichel & true_bkg_shower"
-  reco_nomichel_bkg_other:
-    expr: "reco_nomichel & true_bkg_other"    
+  mip_sideband_light:
+    expr: "mip_sideband & light_cut & in_charge_ratio_time_window"
+  mip_sideband_light_true_michel:
+    expr: "mip_sideband_light & true_michel & ~poor_reco"
+  mip_sideband_light_true_michel_plus:
+    expr: "mip_sideband_light & true_michel_plus & ~poor_reco"
+  mip_sideband_light_true_michel_minus:
+    expr: "mip_sideband_light & true_michel_minus & ~poor_reco"
+  mip_sideband_light_poor_reco:
+    expr: "mip_sideband_light & true_michel & poor_reco"
+  mip_sideband_light_true_capt:
+    expr: "mip_sideband_light & true_capt"
+  mip_sideband_light_bkg_proton:
+    expr: "mip_sideband_light & true_bkg_proton"
+  mip_sideband_light_bkg_stop_proton:
+    expr: "mip_sideband_light & true_bkg_stop_proton"
+  mip_sideband_light_bkg_nonstop_proton:
+    expr: "mip_sideband_light & true_bkg_nonstop_proton"
+  mip_sideband_light_bkg_muon:
+    expr: "mip_sideband_light & true_bkg_muon"
+  mip_sideband_light_bkg_stop_muon:
+    expr: "mip_sideband_light & true_bkg_stop_muon"
+  mip_sideband_light_bkg_nonstop_muon:
+    expr: "mip_sideband_light & true_bkg_nonstop_muon"
+  mip_sideband_light_bkg_neutron:
+    expr: "mip_sideband_light & true_bkg_neutron"
+  mip_sideband_light_bkg_pion:
+    expr: "mip_sideband_light & true_bkg_pion"
+  mip_sideband_light_bkg_shower:
+    expr: "mip_sideband_light & true_bkg_shower"
+  mip_sideband_light_bkg_other:
+    expr: "mip_sideband_light & true_bkg_other"
 
-  reco_nomichel_light:
-    expr: "reco_nomichel & light_cut & in_charge_ratio_time_window"
-  reco_nomichel_light_true_michel:
-    expr: "reco_nomichel_light & true_michel & ~poor_reco"
-  reco_nomichel_light_true_michel_plus:
-    expr: "reco_nomichel_light & true_michel_plus & ~poor_reco"
-  reco_nomichel_light_true_michel_minus:
-    expr: "reco_nomichel_light & true_michel_minus & ~poor_reco"
-  reco_nomichel_light_poor_reco:
-    expr: "reco_nomichel_light & true_michel & poor_reco"
-  reco_nomichel_light_true_capt:
-    expr: "reco_nomichel_light & true_capt"
-  reco_nomichel_light_bkg_proton:
-    expr: "reco_nomichel_light & true_bkg_proton"
-  reco_nomichel_light_bkg_stop_proton:
-    expr: "reco_nomichel_light & true_bkg_stop_proton"
-  reco_nomichel_light_bkg_nonstop_proton:
-    expr: "reco_nomichel_light & true_bkg_nonstop_proton"
-  reco_nomichel_light_bkg_muon:
-    expr: "reco_nomichel_light & true_bkg_muon"
-  reco_nomichel_light_bkg_stop_muon:
-    expr: "reco_nomichel_light & true_bkg_stop_muon"
-  reco_nomichel_light_bkg_nonstop_muon:
-    expr: "reco_nomichel_light & true_bkg_nonstop_muon"
-  reco_nomichel_light_bkg_neutron:
-    expr: "reco_nomichel_light & true_bkg_neutron"
-  reco_nomichel_light_bkg_pion:
-    expr: "reco_nomichel_light & true_bkg_pion"
-  reco_nomichel_light_bkg_shower:
-    expr: "reco_nomichel_light & true_bkg_shower"
-  reco_nomichel_light_bkg_other:
-    expr: "reco_nomichel_light & true_bkg_other"
+  mip_sideband_light_sum50:
+    expr: "mip_sideband & light_cut_sum50 & in_charge_ratio_time_window"
+  mip_sideband_light_sum50_true_michel:
+    expr: "mip_sideband_light_sum50 & true_michel & ~poor_reco"
+  mip_sideband_light_sum50_true_michel_plus:
+    expr: "mip_sideband_light_sum50 & true_michel_plus & ~poor_reco"
+  mip_sideband_light_sum50_true_michel_minus:
+    expr: "mip_sideband_light_sum50 & true_michel_minus & ~poor_reco"
+  mip_sideband_light_sum50_poor_reco:
+    expr: "mip_sideband_light_sum50 & true_michel & poor_reco"
+  mip_sideband_light_sum50_true_capt:
+    expr: "mip_sideband_light_sum50 & true_capt"
+  mip_sideband_light_sum50_bkg_proton:
+    expr: "mip_sideband_light_sum50 & true_bkg_proton"
+  mip_sideband_light_sum50_bkg_stop_proton:
+    expr: "mip_sideband_light_sum50 & true_bkg_stop_proton"
+  mip_sideband_light_sum50_bkg_nonstop_proton:
+    expr: "mip_sideband_light_sum50 & true_bkg_nonstop_proton"
+  mip_sideband_light_sum50_bkg_muon:
+    expr: "mip_sideband_light_sum50 & true_bkg_muon"
+  mip_sideband_light_sum50_bkg_stop_muon:
+    expr: "mip_sideband_light_sum50 & true_bkg_stop_muon"
+  mip_sideband_light_sum50_bkg_nonstop_muon:
+    expr: "mip_sideband_light_sum50 & true_bkg_nonstop_muon"
+  mip_sideband_light_sum50_bkg_neutron:
+    expr: "mip_sideband_light_sum50 & true_bkg_neutron"
+  mip_sideband_light_sum50_bkg_pion:
+    expr: "mip_sideband_light_sum50 & true_bkg_pion"
+  mip_sideband_light_sum50_bkg_shower:
+    expr: "mip_sideband_light_sum50 & true_bkg_shower"
+  mip_sideband_light_sum50_bkg_other:
+    expr: "mip_sideband_light_sum50 & true_bkg_other"
 
-  reco_no_michel_cut_light:
-    expr: "light_cut & in_charge_ratio_time_window"
-  reco_no_michel_cut_light_true_michel:
-    expr: "reco_no_michel_cut_light & true_michel & ~poor_reco"
-  reco_no_michel_cut_light_true_michel_plus:
-    expr: "reco_no_michel_cut_light & true_michel_plus & ~poor_reco"
-  reco_no_michel_cut_light_true_michel_minus:
-    expr: "reco_no_michel_cut_light & true_michel_minus & ~poor_reco"
-  reco_no_michel_cut_light_poor_reco:
-    expr: "reco_no_michel_cut_light & true_michel & poor_reco"
-  reco_no_michel_cut_light_true_capt:
-    expr: "reco_no_michel_cut_light & true_capt"
-  reco_no_michel_cut_light_bkg_proton:
-    expr: "reco_no_michel_cut_light & true_bkg_proton"
-  reco_no_michel_cut_light_bkg_stop_proton:
-    expr: "reco_no_michel_cut_light & true_bkg_stop_proton"
-  reco_no_michel_cut_light_bkg_nonstop_proton:
-    expr: "reco_no_michel_cut_light & true_bkg_nonstop_proton"
-  reco_no_michel_cut_light_bkg_muon:
-    expr: "reco_no_michel_cut_light & true_bkg_muon"
-  reco_no_michel_cut_light_bkg_stop_muon:
-    expr: "reco_no_michel_cut_light & true_bkg_stop_muon"
-  reco_no_michel_cut_light_bkg_nonstop_muon:
-    expr: "reco_no_michel_cut_light & true_bkg_nonstop_muon"
-  reco_no_michel_cut_light_bkg_neutron:
-    expr: "reco_no_michel_cut_light & true_bkg_neutron"
-  reco_no_michel_cut_light_bkg_pion:
-    expr: "reco_no_michel_cut_light & true_bkg_pion"
-  reco_no_michel_cut_light_bkg_shower:
-    expr: "reco_no_michel_cut_light & true_bkg_shower"
-  reco_no_michel_cut_light_bkg_other:
-    expr: "reco_no_michel_cut_light & true_bkg_other"
+  mip_sideband_light_sum60:
+    expr: "mip_sideband & light_cut_sum60 & in_charge_ratio_time_window"
+  mip_sideband_light_sum60_true_michel:
+    expr: "mip_sideband_light_sum60 & true_michel & ~poor_reco"
+  mip_sideband_light_sum60_true_michel_plus:
+    expr: "mip_sideband_light_sum60 & true_michel_plus & ~poor_reco"
+  mip_sideband_light_sum60_true_michel_minus:
+    expr: "mip_sideband_light_sum60 & true_michel_minus & ~poor_reco"
+  mip_sideband_light_sum60_poor_reco:
+    expr: "mip_sideband_light_sum60 & true_michel & poor_reco"
+  mip_sideband_light_sum60_true_capt:
+    expr: "mip_sideband_light_sum60 & true_capt"
+  mip_sideband_light_sum60_bkg_proton:
+    expr: "mip_sideband_light_sum60 & true_bkg_proton"
+  mip_sideband_light_sum60_bkg_stop_proton:
+    expr: "mip_sideband_light_sum60 & true_bkg_stop_proton"
+  mip_sideband_light_sum60_bkg_nonstop_proton:
+    expr: "mip_sideband_light_sum60 & true_bkg_nonstop_proton"
+  mip_sideband_light_sum60_bkg_muon:
+    expr: "mip_sideband_light_sum60 & true_bkg_muon"
+  mip_sideband_light_sum60_bkg_stop_muon:
+    expr: "mip_sideband_light_sum60 & true_bkg_stop_muon"
+  mip_sideband_light_sum60_bkg_nonstop_muon:
+    expr: "mip_sideband_light_sum60 & true_bkg_nonstop_muon"
+  mip_sideband_light_sum60_bkg_neutron:
+    expr: "mip_sideband_light_sum60 & true_bkg_neutron"
+  mip_sideband_light_sum60_bkg_pion:
+    expr: "mip_sideband_light_sum60 & true_bkg_pion"
+  mip_sideband_light_sum60_bkg_shower:
+    expr: "mip_sideband_light_sum60 & true_bkg_shower"
+  mip_sideband_light_sum60_bkg_other:
+    expr: "mip_sideband_light_sum60 & true_bkg_other"
+
+  mip_sideband_light_yield10:
+    expr: "mip_sideband & light_cut_yield10 & in_charge_ratio_time_window"
+  mip_sideband_light_yield10_true_michel:
+    expr: "mip_sideband_light_yield10 & true_michel & ~poor_reco"
+  mip_sideband_light_yield10_true_michel_plus:
+    expr: "mip_sideband_light_yield10 & true_michel_plus & ~poor_reco"
+  mip_sideband_light_yield10_true_michel_minus:
+    expr: "mip_sideband_light_yield10 & true_michel_minus & ~poor_reco"
+  mip_sideband_light_yield10_poor_reco:
+    expr: "mip_sideband_light_yield10 & true_michel & poor_reco"
+  mip_sideband_light_yield10_true_capt:
+    expr: "mip_sideband_light_yield10 & true_capt"
+  mip_sideband_light_yield10_bkg_proton:
+    expr: "mip_sideband_light_yield10 & true_bkg_proton"
+  mip_sideband_light_yield10_bkg_stop_proton:
+    expr: "mip_sideband_light_yield10 & true_bkg_stop_proton"
+  mip_sideband_light_yield10_bkg_nonstop_proton:
+    expr: "mip_sideband_light_yield10 & true_bkg_nonstop_proton"
+  mip_sideband_light_yield10_bkg_muon:
+    expr: "mip_sideband_light_yield10 & true_bkg_muon"
+  mip_sideband_light_yield10_bkg_stop_muon:
+    expr: "mip_sideband_light_yield10 & true_bkg_stop_muon"
+  mip_sideband_light_yield10_bkg_nonstop_muon:
+    expr: "mip_sideband_light_yield10 & true_bkg_nonstop_muon"
+  mip_sideband_light_yield10_bkg_neutron:
+    expr: "mip_sideband_light_yield10 & true_bkg_neutron"
+  mip_sideband_light_yield10_bkg_pion:
+    expr: "mip_sideband_light_yield10 & true_bkg_pion"
+  mip_sideband_light_yield10_bkg_shower:
+    expr: "mip_sideband_light_yield10 & true_bkg_shower"
+  mip_sideband_light_yield10_bkg_other:
+    expr: "mip_sideband_light_yield10 & true_bkg_other"
+
+  mip_sideband_light_yield20:
+    expr: "mip_sideband & light_cut_yield20 & in_charge_ratio_time_window"
+  mip_sideband_light_yield20_true_michel:
+    expr: "mip_sideband_light_yield20 & true_michel & ~poor_reco"
+  mip_sideband_light_yield20_true_michel_plus:
+    expr: "mip_sideband_light_yield20 & true_michel_plus & ~poor_reco"
+  mip_sideband_light_yield20_true_michel_minus:
+    expr: "mip_sideband_light_yield20 & true_michel_minus & ~poor_reco"
+  mip_sideband_light_yield20_poor_reco:
+    expr: "mip_sideband_light_yield20 & true_michel & poor_reco"
+  mip_sideband_light_yield20_true_capt:
+    expr: "mip_sideband_light_yield20 & true_capt"
+  mip_sideband_light_yield20_bkg_proton:
+    expr: "mip_sideband_light_yield20 & true_bkg_proton"
+  mip_sideband_light_yield20_bkg_stop_proton:
+    expr: "mip_sideband_light_yield20 & true_bkg_stop_proton"
+  mip_sideband_light_yield20_bkg_nonstop_proton:
+    expr: "mip_sideband_light_yield20 & true_bkg_nonstop_proton"
+  mip_sideband_light_yield20_bkg_muon:
+    expr: "mip_sideband_light_yield20 & true_bkg_muon"
+  mip_sideband_light_yield20_bkg_stop_muon:
+    expr: "mip_sideband_light_yield20 & true_bkg_stop_muon"
+  mip_sideband_light_yield20_bkg_nonstop_muon:
+    expr: "mip_sideband_light_yield20 & true_bkg_nonstop_muon"
+  mip_sideband_light_yield20_bkg_neutron:
+    expr: "mip_sideband_light_yield20 & true_bkg_neutron"
+  mip_sideband_light_yield20_bkg_pion:
+    expr: "mip_sideband_light_yield20 & true_bkg_pion"
+  mip_sideband_light_yield20_bkg_shower:
+    expr: "mip_sideband_light_yield20 & true_bkg_shower"
+  mip_sideband_light_yield20_bkg_other:
+    expr: "mip_sideband_light_yield20 & true_bkg_other"
     
   hand_scan0:
     expr: "reco_muon_veto & (tagged_nhit >= 8) & (tagged_nhit < 14)"
@@ -1192,6 +2366,14 @@ variables:
     expr: "true_michel & angle_veto"
   hand_scan6: # events rejected due to downward direction
     expr: "(true_michel | true_capt) & ~reco_muon_veto"
+  hand_scan7: # excess/missing events in run 2 TPC 2 => due to bad readout UARTs in some runs
+    expr: "reco_muon_veto & (stop_z > 0) & (stop_y > -370) & (stop_y < -150)"
+  hand_scan8: # abnormal prompt vs delayed light signals
+    expr: "reco_muon_veto & (prompt_ampl > 0) & (delayed_sum > 200) & (prompt_ampl < 0.1 * delayed_sum)"
+  hand_scan9: # excess low prompt acceptance events in data
+    expr: "(prompt_acc == 0) & reco_muon_veto"
+  short_stopping_michel: # short events with a delayed light signal present
+    expr: "reco_muon_veto & light_cut & in_michel_plus_time_window & (muon_range < 100)"
   hand_scan_bkg_proton:
     expr: "reco_muon_veto_bkg_proton"
   hand_scan_bkg_muon:
