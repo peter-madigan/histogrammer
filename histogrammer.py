@@ -90,6 +90,7 @@ import multiprocessing
 import argparse
 import warnings
 import time
+import sys
 
 import h5py
 import shutil
@@ -198,7 +199,7 @@ def generate_histograms(index, input_filepath, output_filepath, histograms, *arg
                     event_list[var] = []
 
         entry_list = dict()
-        if variables and entry_list_variables:
+        if entry_list_variables:
             for filt,var in entry_list_variables.items():
                 entry_list[filt] = []
 
@@ -238,13 +239,13 @@ def generate_histograms(index, input_filepath, output_filepath, histograms, *arg
             for filt,var in entry_list_variables.items():
                 try:
                     mask = globals()[filt].astype(bool)
-                    entry_data = np.empty(mask.sum(), dtype=[(v, globals()[v].dtype) for v in var if hasattr(globals()[v], 'dtype')])
+                    entry_data = np.empty(mask.sum(), dtype=[(v, globals()[v].dtype) + ((globals()[v].shape[1:],) if globals()[v].ndim > 1 else ()) for v in var if hasattr(globals()[v], 'dtype')])
                     for v in var:
                         if hasattr(globals()[v], 'dtype'):
                             entry_data[v] = globals()[v][mask]
-                            entry_list[filt].append(entry_data)
+                    entry_list[filt].append(entry_data)
                 except Exception as e:
-                    if verbose:
+                    if verbose or True:
                         warnings.warn(f'error generating entry list {filt}/{var} : '+str(e))
 
             # Update histograms
@@ -269,10 +270,20 @@ def generate_histograms(index, input_filepath, output_filepath, histograms, *arg
                             try:
                                 if variables[var].get('filt', True) and np.any(globals()[var]):
                                     mask = globals()[var].astype(bool)
-                                    hists[hist][var] += np.histogramdd([only_valid(d[mask], bins[hist][i][0]) for i,d in enumerate(data)], bins=bins[hist], weights=only_valid(w[mask] if w is not None else None))[0]
+                                    assert len(mask.shape) == 1, f'Error filling {hist}/{var}: mask shape is {mask.shape}'
+                                    assert np.all([
+                                        len(d[mask].shape) >= 1 for i,d in enumerate(data)
+                                    ]), f'Error filling {hist}/{var}: shape is {[d[mask].shape for d in data]}'
+                                    assert w is None, f'Error weight is : {w.shape}'
+                                    hists[hist][var] += np.histogramdd(
+                                        [only_valid(d[mask], bins[hist][i][0]) for i,d in enumerate(data)],
+                                        bins=bins[hist],
+                                        weights=only_valid(w[mask] if w is not None else None)
+                                    )[0]
 
                             except Exception as e:
                                 if verbose:
+                                    pass
                                     warnings.warn(f'error filling {basename}/{hist}/{var} : '+str(e))
                 except Exception as e:
                     if verbose:
@@ -284,7 +295,6 @@ def generate_histograms(index, input_filepath, output_filepath, histograms, *arg
     print(f'loop: {now-then:0.03f}s')
     then = now
 
-    print(input_filepath, event_list)
     save(
         output_filepath,
         input_filepath,
@@ -335,7 +345,7 @@ def save(outpath, filepath, hists, histograms, event_list, entry_list, compressi
             if 'entries' not in f:
                 f.create_group('entries')
             entries = f['entries']
-                
+            
             if 'file_map' not in entries:
                 file_map = np.zeros((1,), dtype='S256')
                 file_map[0] = filename
@@ -344,8 +354,10 @@ def save(outpath, filepath, hists, histograms, event_list, entry_list, compressi
                 entries['file_map'].resize((len(entries['file_map'])+1,))
                 entries['file_map'][-1] = filename
             file_idx = len(entries['file_map'])-1
-                
+            
             for filt in entry_list:
+                if len(entry_list[filt]) == 0:
+                    continue
                 entry_data = np.concatenate(entry_list[filt], axis=0)
                 entry_data = rfn.rec_append_fields(
                     entry_data,
@@ -381,13 +393,14 @@ def save(outpath, filepath, hists, histograms, event_list, entry_list, compressi
                 if hist not in sum_grp:
                     sum_grp.create_dataset(hist, data=hist_dict[hist], **compression_args)
                 else:
+                    new_hist = hist_dict[hist] + save_cache.get(hist_name + '/' + hist, 0)
                     if flush_cache:
-                        if np.any(save_cache.get(hist_name + '/' + hist, 0) + hist_dict[hist] != 0):
-                            sum_grp[hist][:] = sum_grp[hist][:] + hist_dict[hist] + save_cache.get(hist_name + '/' + hist, 0)
+                        if np.any(new_hist != 0):
+                            sum_grp[hist][:] = sum_grp[hist][:] + new_hist
                     else:
-                        save_cache[hist_name + '/' + hist] = save_cache.get(hist_name + '/' + hist, 0) + hist_dict[hist]
+                        save_cache[hist_name + '/' + hist] = new_hist
                 if verbose:
-                    print(f'\tAdded {hist_dict[hist].sum()} new entries to {hist_name}/sum/{hist}')
+                    print(f'\tAdded {hist_dict[hist].sum()} ({hist_dict[hist].shape}) new entries to {hist_name}/sum/{hist}')
 
             if runxrun is not None:
                 # maybe create new individual run dataset
@@ -413,7 +426,7 @@ def merge_files(filename0, filename1):
         with h5py.File(filename0, 'a') as f0:
             try:
                 with h5py.File(filename1, 'a') as f1:            
-                    for key in f1:
+                    for key in sorted(f1.keys()):
                         # copy entries
                         if key == 'entries':
                             file_map1 = f1['entries/file_map']
@@ -423,7 +436,7 @@ def merge_files(filename0, filename1):
                                 f0.create_group('entries')
 
                             # update file mapping - keep track of index to update datasets
-                            if 'entries/file_map' not in f0:
+                            if 'file_map' not in f0['entries']:
                                 f0['entries'].create_dataset('file_map', data=file_map1, maxshape=(None,))
                                 remap = np.arange(len(file_map1), dtype=int)
                             else:
@@ -433,7 +446,7 @@ def merge_files(filename0, filename1):
                                 remap = np.arange(len(file_map0), dtype=int)[-len(file_map1):]
 
                             # loop over all entries datasets
-                            for filt in f1['entries'].keys():
+                            for filt in sorted(f1['entries'].keys()):
                                 if filt == 'file_map':
                                     continue
                                 entries1 = f1['entries'][filt]
@@ -442,8 +455,9 @@ def merge_files(filename0, filename1):
                                 # update datasets
                                 if filt in f0['entries']:
                                     entries0 = f0['entries'][filt]
-                                    entries0.resize((entries0.shape[0] + entries1.shape[0],))
-                                    entries0[-len(entries1):] = entries1[:]
+                                    if len(entries1):
+                                        entries0.resize((entries0.shape[0] + entries1.shape[0],))
+                                        entries0[-len(entries1):] = entries1[:]
                                 else:
                                     f0['entries'].create_dataset(filt, data=entries1[:], maxshape=(None,))
 
@@ -463,7 +477,7 @@ def merge_files(filename0, filename1):
                             hist_name = key
 
                             # combine sums
-                            for filt in f1[hist_name]['sum']:
+                            for filt in sorted(f1[hist_name]['sum']):
                                 if hist_name not in f0:
                                     f0.create_group(hist_name)
                                     for key in f1[hist_name].attrs:
@@ -528,12 +542,14 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
             event_list = config['event-list']
         else:
             event_list += config['event-list']
+    print('Event list(s):', event_list)
 
     if 'entry-list' in config:
         if entry_list is None:
             entry_list = config['entry-list']
         else:
             entry_list += config['entry-list']
+    print('Entry list(s):', list(entry_list.keys()))
     
     for hist_name in list(config['histograms'].keys()):
         hist_config = config['histograms'][hist_name]
@@ -560,15 +576,25 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
                         # histogram exists, and we do want to update it, so lets reset it
                         print(f'Regenerating existing histogram {hist_name}')
                         del f[hist_name]
+                    elif hist_name == 'events':
+                        # always regenerate event lists or entry lists
+                        del f[hist_name]
+                    elif hist_name == 'entries':
+                        del f[hist_name]
                     else:
                         # histogram doesn't exist, so just do nothing
                         pass
                         
             except Exception as e:
                 print(f'Error occurred when trying to check if histogram {hist_name} exists: {e}')
+    print('Histogram(s)', list(config['histograms'].keys()))
 
     with h5py.File(outpath, 'a') as f:
         f['/'].attrs['config'] = str(config)
+        if 'entries' in f:
+            del f['entries']
+        if 'events' in f:
+            del f['events']
 
     processes = processes if processes is not None else multiprocessing.cpu_count()
     processes = min(processes, len(filepaths))
@@ -655,7 +681,7 @@ def main(config_yaml, outpath, filepaths, compression, processes=None, batch_siz
         if merge_queue.qsize():
             last_file = merge_queue.get()
             merge_files(outpath, last_file)
-        shutil.rmtree(outpath + '.tmp')
+        #shutil.rmtree(outpath + '.tmp')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
